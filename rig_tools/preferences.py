@@ -101,7 +101,7 @@ def get_addon_prefs():
     return addons_prefs[id].preferences if id in addons_prefs else None
 
 def is_addon_keymap(kmi):
-    return kmi.idname in {'object.empty_operator',}
+    return kmi.idname in {'paint.toggle_weight_paint',}
 
 # OVERRIDE DEFAULT KEYMAPS
 @persistent
@@ -158,7 +158,7 @@ def unregister_keymaps():
     keyconfigs = bpy.context.window_manager.keyconfigs
     kc_addonconf = keyconfigs.addon
 
-    km = kc_addonconf.keymaps['Object Mode']
+    km = kc_addonconf.keymaps['Weight Paint']
     #
     for kmi in km.keymap_items:
         if is_addon_keymap(kmi):
