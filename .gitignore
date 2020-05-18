@@ -1,0 +1,5 @@
+*.blend
+*.blend1
+*.pyc
+*.zip
+*/__pycache__
