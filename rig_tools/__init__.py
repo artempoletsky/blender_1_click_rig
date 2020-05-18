@@ -34,9 +34,10 @@ classes = (
 
 def vertex_menu_draw(self, context):
     layout = self.layout
-    layout.separator()
-    layout.operator_context = "INVOKE_DEFAULT"
-    layout.operator(PlaceBoneToVertexOperator.bl_idname, text = PlaceBoneToVertexOperator.bl_label)
+    if PlaceBoneToVertexOperator.poll(context):
+        layout.separator()
+        layout.operator_context = "INVOKE_DEFAULT"
+        layout.operator(PlaceBoneToVertexOperator.bl_idname, text = PlaceBoneToVertexOperator.bl_label)
 
 def vertext_context_menu_func(self, context):
     if tuple(context.scene.tool_settings.mesh_select_mode) != (True, False, False):
