@@ -8,8 +8,8 @@ if blend_dir not in sys.path:
 
 import rig_tools
 #import single_file_addon
-import imp
-imp.reload(rig_tools)
+import importlib
+importlib.reload(rig_tools)
 #imp.reload(single_file_addon)
 rig_tools.register()
 #single_file_addon.register()

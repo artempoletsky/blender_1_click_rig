@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Rig tools",
     "author": "Artem Poletsky",
-    "version": (1, 0, 0),
+    "version": (1, 0, 1),
     "blender": (2, 82, 0),
     "location": "",
     "description": "The collection of rig operators",
@@ -17,11 +17,14 @@ if "bpy" in locals():
     WeightPaintToggleOperator = weight_paint_toggle.WeightPaintToggleOperator
     importlib.reload(place_bone_to_vertex)
     PlaceBoneToVertexOperator = place_bone_to_vertex.PlaceBoneToVertexOperator
+    importlib.reload(merge_bones_with_vgroups)
+    MergeBonesOperator = merge_bones_with_vgroups.MergeBonesOperator
 
 else:
     from . import preferences
     from .weight_paint_toggle import WeightPaintToggleOperator
     from .place_bone_to_vertex import PlaceBoneToVertexOperator
+    from .merge_bones_with_vgroups import MergeBonesOperator
 
 import bpy
 
@@ -30,6 +33,7 @@ classes = (
     # preferences.BoilerplatePreferencesAddKeymapOperator,
     WeightPaintToggleOperator,
     PlaceBoneToVertexOperator,
+    MergeBonesOperator,
 )
 
 def vertex_menu_draw(self, context):
@@ -48,7 +52,7 @@ def vertext_context_menu_func(self, context):
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
-
+    print(123)
     preferences.register_keymaps()
     bpy.types.VIEW3D_MT_edit_mesh_vertices.append(vertex_menu_draw)
     bpy.types.VIEW3D_MT_edit_mesh_context_menu.append(vertext_context_menu_func)

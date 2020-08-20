@@ -3,3 +3,5 @@
 *.pyc
 *.zip
 */__pycache__
+*.dae
+*.jpg
