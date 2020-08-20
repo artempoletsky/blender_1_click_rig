@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Rig tools",
     "author": "Artem Poletsky",
-    "version": (1, 0, 1),
+    "version": (1, 1, 0),
     "blender": (2, 82, 0),
     "location": "",
     "description": "The collection of rig operators",
@@ -19,12 +19,15 @@ if "bpy" in locals():
     PlaceBoneToVertexOperator = place_bone_to_vertex.PlaceBoneToVertexOperator
     importlib.reload(merge_bones_with_vgroups)
     MergeBonesOperator = merge_bones_with_vgroups.MergeBonesOperator
+    importlib.reload(clear_empty_bones)
+    ClearEmptyBonesOperator = clear_empty_bones.ClearEmptyBonesOperator
 
 else:
     from . import preferences
     from .weight_paint_toggle import WeightPaintToggleOperator
     from .place_bone_to_vertex import PlaceBoneToVertexOperator
     from .merge_bones_with_vgroups import MergeBonesOperator
+    from .clear_empty_bones import ClearEmptyBonesOperator
 
 import bpy
 
@@ -34,6 +37,7 @@ classes = (
     WeightPaintToggleOperator,
     PlaceBoneToVertexOperator,
     MergeBonesOperator,
+    ClearEmptyBonesOperator,
 )
 
 def vertex_menu_draw(self, context):
