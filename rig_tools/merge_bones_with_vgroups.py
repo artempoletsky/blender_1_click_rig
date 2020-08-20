@@ -34,7 +34,7 @@ class MergeBonesOperator(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         return (context.space_data.type == 'VIEW_3D'
-            and len(context.selected_objects) > 0
+            # and len(context.selected_objects) > 0
             and context.view_layer.objects.active
             and context.object.type == 'ARMATURE'
             and context.object.mode == 'EDIT')
