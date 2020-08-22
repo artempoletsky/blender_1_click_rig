@@ -21,6 +21,10 @@ if "bpy" in locals():
     MergeBonesOperator = merge_bones_with_vgroups.MergeBonesOperator
     importlib.reload(clear_empty_bones)
     ClearEmptyBonesOperator = clear_empty_bones.ClearEmptyBonesOperator
+    importlib.reload(rename_bones)
+    RenameBonesOperator = rename_bones.RenameBonesOperator
+    importlib.reload(arrange_bones)
+    ArrangeBonesOperator = arrange_bones.ArrangeBonesOperator
 
 else:
     from . import preferences
@@ -28,6 +32,8 @@ else:
     from .place_bone_to_vertex import PlaceBoneToVertexOperator
     from .merge_bones_with_vgroups import MergeBonesOperator
     from .clear_empty_bones import ClearEmptyBonesOperator
+    from .rename_bones import RenameBonesOperator
+    from .arrange_bones import ArrangeBonesOperator
 
 import bpy
 
@@ -38,6 +44,8 @@ classes = (
     PlaceBoneToVertexOperator,
     MergeBonesOperator,
     ClearEmptyBonesOperator,
+    RenameBonesOperator,
+    ArrangeBonesOperator,
 )
 
 def vertex_menu_draw(self, context):
@@ -56,7 +64,7 @@ def vertext_context_menu_func(self, context):
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
-    print(123)
+
     preferences.register_keymaps()
     bpy.types.VIEW3D_MT_edit_mesh_vertices.append(vertex_menu_draw)
     bpy.types.VIEW3D_MT_edit_mesh_context_menu.append(vertext_context_menu_func)

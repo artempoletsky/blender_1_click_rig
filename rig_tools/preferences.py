@@ -106,7 +106,8 @@ def is_addon_keymap(kmi):
 # OVERRIDE DEFAULT KEYMAPS
 @persistent
 def on_load():
-    print('on_load')
+    # print('on_load')
+    return
     # keyconfigs = bpy.context.window_manager.keyconfigs
     # kmis = keyconfigs.default.keymaps['Mesh'].keymap_items
     # i = 0
@@ -145,9 +146,9 @@ def register_keymaps():
 
     prefs = get_addon_prefs()
     if prefs and prefs.is_installed:
-        print('addon is installed')
+        # print('addon is installed')
         return
-    print('addon is installing')
+    # print('addon is installing')
 
     if prefs:
         prefs.is_installed = True
