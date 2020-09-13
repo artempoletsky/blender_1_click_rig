@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Rig tools",
     "author": "Artem Poletsky",
-    "version": (1, 1, 0),
+    "version": (1, 1, 1),
     "blender": (2, 82, 0),
     "location": "",
     "description": "The collection of rig operators",
@@ -25,6 +25,8 @@ if "bpy" in locals():
     RenameBonesOperator = rename_bones.RenameBonesOperator
     importlib.reload(arrange_bones)
     ArrangeBonesOperator = arrange_bones.ArrangeBonesOperator
+    importlib.reload(swap_bones_weights)
+    SwapBonesWeightsOperator = swap_bones_weights.SwapBonesWeightsOperator
 
 else:
     from . import preferences
@@ -34,6 +36,7 @@ else:
     from .clear_empty_bones import ClearEmptyBonesOperator
     from .rename_bones import RenameBonesOperator
     from .arrange_bones import ArrangeBonesOperator
+    from .swap_bones_weights import SwapBonesWeightsOperator
 
 import bpy
 
@@ -46,6 +49,7 @@ classes = (
     ClearEmptyBonesOperator,
     RenameBonesOperator,
     ArrangeBonesOperator,
+    SwapBonesWeightsOperator,
 )
 
 def vertex_menu_draw(self, context):
