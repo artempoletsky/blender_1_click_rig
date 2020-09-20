@@ -25,3 +25,5 @@ Usage:
 1. select unreal armature
 2. select rigify rig. Rig **MUST** be an active element. 
 3. run operator. 
+
+Original unreal armature will be copied on 24 layer of rigify rig. 
