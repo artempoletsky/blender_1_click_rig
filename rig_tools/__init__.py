@@ -1,10 +1,10 @@
 bl_info = {
-    "name": "Rig tools",
+    "name": "1 click rig",
     "author": "Artem Poletsky",
-    "version": (1, 1, 1),
+    "version": (1, 2, 0),
     "blender": (2, 82, 0),
     "location": "",
-    "description": "The collection of rig operators",
+    "description": "A collection of rig operators",
     "warning": "",
     "wiki_url": "",
     "category": "Rigging",
@@ -27,6 +27,12 @@ if "bpy" in locals():
     ArrangeBonesOperator = arrange_bones.ArrangeBonesOperator
     importlib.reload(swap_bones_weights)
     SwapBonesWeightsOperator = swap_bones_weights.SwapBonesWeightsOperator
+    importlib.reload(generate_metarig)
+    GenerateMetarigOperator = generate_metarig.GenerateMetarigOperator
+    importlib.reload(bind_rig_to_armature)
+    BindRigifyToArmatureOperator = bind_rig_to_armature.BindRigifyToArmatureOperator
+    importlib.reload(convert_to_rigify)
+    ConvertToRigifyOperator = convert_to_rigify.ConvertToRigifyOperator
 
 else:
     from . import preferences
@@ -37,6 +43,9 @@ else:
     from .rename_bones import RenameBonesOperator
     from .arrange_bones import ArrangeBonesOperator
     from .swap_bones_weights import SwapBonesWeightsOperator
+    from .generate_metarig import GenerateMetarigOperator
+    from .bind_rig_to_armature import BindRigifyToArmatureOperator
+    from .convert_to_rigify import ConvertToRigifyOperator
 
 import bpy
 
@@ -50,6 +59,9 @@ classes = (
     RenameBonesOperator,
     ArrangeBonesOperator,
     SwapBonesWeightsOperator,
+    GenerateMetarigOperator,
+    BindRigifyToArmatureOperator,
+    ConvertToRigifyOperator,
 )
 
 def vertex_menu_draw(self, context):
