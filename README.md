@@ -1,2 +1,2 @@
-# blender_1_click_rig
-A collection of rig operators
+#  1 click rig
+A collection of rig operators for Blender.
