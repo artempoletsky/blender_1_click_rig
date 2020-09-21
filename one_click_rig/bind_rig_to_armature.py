@@ -267,6 +267,8 @@ class BindRigifyToArmatureOperator(bpy.types.Operator):
         set_def_bones_deform(context, rig, False)
         fix_poles(context, rig)
         set_ik_follow_bone(context, rig, True)
+
+        rig.pose.ik_solver = 'ITASC'
         return {'FINISHED'}
 
     def invoke(self, context, event):

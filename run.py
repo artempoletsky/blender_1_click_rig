@@ -11,5 +11,5 @@ import one_click_rig
 import importlib
 importlib.reload(one_click_rig)
 #imp.reload(single_file_addon)
-rig_tools.register()
+one_click_rig.register()
 #single_file_addon.register()
