@@ -1,7 +1,7 @@
 bl_info = {
     "name": "1 click rig",
     "author": "Artem Poletsky",
-    "version": (1, 2, 0),
+    "version": (1, 3, 0),
     "blender": (2, 82, 0),
     "location": "",
     "description": "A collection of rig operators",
@@ -33,6 +33,8 @@ if "bpy" in locals():
     BindRigifyToArmatureOperator = bind_rig_to_armature.BindRigifyToArmatureOperator
     importlib.reload(convert_to_rigify)
     ConvertToRigifyOperator = convert_to_rigify.ConvertToRigifyOperator
+    importlib.reload(retarget_animation)
+    RetargetAnimationOperator = retarget_animation.RetargetAnimationOperator
 
 else:
     from . import preferences
@@ -46,6 +48,7 @@ else:
     from .generate_metarig import GenerateMetarigOperator
     from .bind_rig_to_armature import BindRigifyToArmatureOperator
     from .convert_to_rigify import ConvertToRigifyOperator
+    from .retarget_animation import RetargetAnimationOperator
 
 import bpy
 
@@ -62,6 +65,7 @@ classes = (
     GenerateMetarigOperator,
     BindRigifyToArmatureOperator,
     ConvertToRigifyOperator,
+    RetargetAnimationOperator,
 )
 
 def vertex_menu_draw(self, context):

@@ -196,8 +196,9 @@ def add_single_bone(name, parent_name, source_armature, object, direction_bone_n
 
     b_fun.align_bone_x_axis(bone, saved_y_axises[name])
 
-    set_rigify_type(object, bone.name, 'basic.super_copy', layer + fk_layer_offset, layer + tweak_layer_offset)
-    return
+    rigify_parameters = set_rigify_type(object, bone.name, 'basic.super_copy', layer + fk_layer_offset, layer + tweak_layer_offset)
+
+    return bone, rigify_parameters
 
 def create_spine(source_armature, object):
     spine = ['pelvis', 'spine_01', 'spine_02', 'spine_03']
@@ -353,9 +354,11 @@ class GenerateMetarigOperator(bpy.types.Operator):
         create_spine(source_armature, context.object)
         create_head(source_armature, context.object)
 
-        add_single_bone('clavicle_l', 'spine_03', source_armature, context.object, direction_bone_name = 'upperarm_l', layer = 3)
-        add_single_bone('clavicle_r', 'spine_03', source_armature, context.object, direction_bone_name = 'upperarm_r', layer = 3)
-
+        bone, params = add_single_bone('clavicle_l', 'spine_03', source_armature, context.object, direction_bone_name = 'upperarm_l', layer = 3)
+        params.make_widget = False
+        bone, params = add_single_bone('clavicle_r', 'spine_03', source_armature, context.object, direction_bone_name = 'upperarm_r', layer = 3)
+        params.make_widget = False
+        
         add_single_bone('breast_l', 'spine_02', source_armature, context.object, layer = 3)
         add_single_bone('breast_r', 'spine_02', source_armature, context.object, layer = 3)
 
