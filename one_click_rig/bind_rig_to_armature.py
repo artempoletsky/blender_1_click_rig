@@ -5,6 +5,9 @@ from . import preferences
 
 from . import bone_functions as b_fun
 
+def tag_rig(rig):
+    rig.data['one_click_rig'] = bpy.context.window_manager.one_click_rig_version
+
 oops = bpy.ops.object
 aops = bpy.ops.armature
 pops = bpy.ops.pose
@@ -165,7 +168,7 @@ def create_copy_bones(context, rig):
     dir_path = os.path.dirname(os.path.realpath(__file__))
     mapping = BoneMapping(dir_path + '/mappings/rigify_ue.json', True)
 
-    oops.editmode_toggle()
+    oops.mode_set(mode = 'EDIT')
     aops.select_all(action = 'SELECT')
 
     bone_names = []
@@ -207,6 +210,8 @@ def create_copy_bones(context, rig):
         # constr.owner_space = 'LOCAL'
 
     oops.posemode_toggle()
+
+    tag_rig(rig)
 
     return
 
@@ -256,7 +261,7 @@ class BindRigifyToArmatureOperator(bpy.types.Operator):
         fix_poles(context, rig)
         set_ik_follow_bone(context, rig, True)
 
-        rig.pose.ik_solver = 'ITASC'
+        # rig.pose.ik_solver = 'ITASC'
         return {'FINISHED'}
 
     def invoke(self, context, event):

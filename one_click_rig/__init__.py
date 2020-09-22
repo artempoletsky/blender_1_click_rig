@@ -1,7 +1,7 @@
 bl_info = {
     "name": "1 click rig",
     "author": "Artem Poletsky",
-    "version": (1, 3, 0),
+    "version": (1, 3, 1),
     "blender": (2, 82, 0),
     "location": "",
     "description": "A collection of rig operators",
@@ -37,6 +37,9 @@ if "bpy" in locals():
     RetargetAnimationOperator = retarget_animation.RetargetAnimationOperator
     importlib.reload(reset_rigify)
     ResetRigifyOperator = reset_rigify.ResetRigifyOperator
+    importlib.reload(add_unreal_skeleton)
+    AddUnrealSkeletonOperator = add_unreal_skeleton.AddUnrealSkeletonOperator
+    SaveSkeletonDataOperator = add_unreal_skeleton.SaveSkeletonDataOperator
 
 else:
     from . import preferences
@@ -52,6 +55,7 @@ else:
     from .convert_to_rigify import ConvertToRigifyOperator
     from .retarget_animation import RetargetAnimationOperator
     from .reset_rigify import ResetRigifyOperator
+    from .add_unreal_skeleton import AddUnrealSkeletonOperator, SaveSkeletonDataOperator
 
 import bpy
 
@@ -70,6 +74,8 @@ classes = (
     ConvertToRigifyOperator,
     RetargetAnimationOperator,
     ResetRigifyOperator,
+    AddUnrealSkeletonOperator,
+    SaveSkeletonDataOperator,
 )
 
 def vertex_menu_draw(self, context):
@@ -89,6 +95,9 @@ def register():
     for cls in classes:
         bpy.utils.register_class(cls)
 
+    version = ".".join(str(x) for x in bl_info["version"])
+
+    bpy.types.WindowManager.one_click_rig_version = bpy.props.StringProperty(name = 'One_click_rig', default = version)
     preferences.register_keymaps()
     bpy.types.VIEW3D_MT_edit_mesh_vertices.append(vertex_menu_draw)
     bpy.types.VIEW3D_MT_edit_mesh_context_menu.append(vertext_context_menu_func)
@@ -100,6 +109,7 @@ def unregister():
     bpy.types.VIEW3D_MT_edit_mesh_vertices.remove(vertex_menu_draw)
     bpy.types.VIEW3D_MT_edit_mesh_context_menu.remove(vertext_context_menu_func)
 
+    del bpy.types.WindowManager.one_click_rig_version
     preferences.unregister_keymaps()
 
 if __name__ == "__main__":

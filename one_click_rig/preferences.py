@@ -27,7 +27,7 @@ class RigToolsPreferencesDefaults():
 defaults = RigToolsPreferencesDefaults()
 
 class RigToolsPreferences(bpy.types.AddonPreferences):
-    bl_idname = 'boilerplate'
+    bl_idname = 'one_click_rig'
 
     tabs : bpy.props.EnumProperty(name="Tabs",
         items = [("GENERAL", "General", ""),
@@ -38,6 +38,8 @@ class RigToolsPreferences(bpy.types.AddonPreferences):
     hello : bpy.props.StringProperty(name = "Hello text", default = defaults.hello)
 
     is_installed : bpy.props.BoolProperty(name = "Is installed", default = False)
+    version : bpy.props.StringProperty(name = "Version", default = '(0, 0, 0)')
+
 
     def draw(self, context):
         layout = self.layout
@@ -97,7 +99,7 @@ def get_prefs():
 
 def get_addon_prefs():
     addons_prefs = bpy.context.preferences.addons
-    id = 'rig_tools'
+    id = RigToolsPreferences.bl_idname
     return addons_prefs[id].preferences if id in addons_prefs else None
 
 def is_addon_keymap(kmi):
