@@ -81,6 +81,10 @@ class AddUnrealSkeletonOperator(bpy.types.Operator):
         mapping = BoneMapping(dir_path + '/mappings/rigify_ue.json', False)
 
         rig = context.view_layer.objects.active
+
+        if 'one_click_rig' in rig.data:
+            self.report({'WARNING'}, 'Rig is already contains unreal skeleton')
+            return {'FINISHED'}
         oops.mode_set(mode = 'EDIT')
 
         b_fun.switch_to_layer(rig.data, 24)
@@ -130,6 +134,8 @@ class AddUnrealSkeletonOperator(bpy.types.Operator):
         bind.set_ik_follow_bone(context, rig, True)
 
         bind.tag_rig(rig)
+
+        self.report({'INFO'}, 'Unreal skeleton sucessfully added')
 
         return {'FINISHED'}
 
