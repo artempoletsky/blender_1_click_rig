@@ -102,11 +102,6 @@ def set_ik_follow_bone(context, rig, value):
         copy_loc.subtarget = value
     return
 
-def set_def_bones_deform(context, rig, value):
-    for b in rig.data.bones:
-        if b.name.startswith('DEF'):
-            b.use_deform = value
-
 ik_prop_bones = ['thig_parent.L', 'thig_parent.R', 'upper_arm_parent.L', 'upper_arm_parent.R']
 # ik_bones = [
 #     '["thig_ik.L", "MCH-shin_ik.L", "MCH-thig_ik_target.L"]',
@@ -164,13 +159,6 @@ def disable_stretch(context, rig):
         rig.pose.bones[b]['IK_Stretch'] = 0
     return
 
-def show_layers(context, rig, animation_ready):
-    layers = rig.data.layers
-    visible_layers = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18, 28]
-    if animation_ready:
-        visible_layers = [0, 3, 5, 7, 10, 13, 16, 28]
-    b_fun.set_array_indices(layers, visible_layers)
-    return
 
 def create_copy_bones(context, rig):
 
@@ -262,9 +250,9 @@ class BindRigifyToArmatureOperator(bpy.types.Operator):
 
         if self.animation_ready:
             disable_stretch(context, rig)
-        show_layers(context, rig, self.animation_ready)
+        b_fun.show_layers(rig, self.animation_ready)
 
-        set_def_bones_deform(context, rig, False)
+        b_fun.set_def_bones_deform(rig, False)
         fix_poles(context, rig)
         set_ik_follow_bone(context, rig, True)
 

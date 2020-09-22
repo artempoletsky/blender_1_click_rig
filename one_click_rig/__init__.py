@@ -35,6 +35,8 @@ if "bpy" in locals():
     ConvertToRigifyOperator = convert_to_rigify.ConvertToRigifyOperator
     importlib.reload(retarget_animation)
     RetargetAnimationOperator = retarget_animation.RetargetAnimationOperator
+    importlib.reload(reset_rigify)
+    ResetRigifyOperator = reset_rigify.ResetRigifyOperator
 
 else:
     from . import preferences
@@ -49,6 +51,7 @@ else:
     from .bind_rig_to_armature import BindRigifyToArmatureOperator
     from .convert_to_rigify import ConvertToRigifyOperator
     from .retarget_animation import RetargetAnimationOperator
+    from .reset_rigify import ResetRigifyOperator
 
 import bpy
 
@@ -66,6 +69,7 @@ classes = (
     BindRigifyToArmatureOperator,
     ConvertToRigifyOperator,
     RetargetAnimationOperator,
+    ResetRigifyOperator,
 )
 
 def vertex_menu_draw(self, context):

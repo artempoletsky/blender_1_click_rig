@@ -24,3 +24,30 @@ def align_bone_x_axis(edit_bone, new_x_axis):
     dot2 = edit_bone.z_axis.dot(new_x_axis)
     if dot1 > dot2:
         edit_bone.roll += angle * 2.0
+
+def set_def_bones_deform(rig, value):
+    for b in rig.data.bones:
+        if b.name.startswith('DEF'):
+            print(b.name)
+            b.use_deform = value
+
+
+def rename_v_group(object, name, new_name):
+    v_group = object.vertex_groups.get(name)
+    # print(v_group)
+    if not v_group:
+        return
+    v_group.name = new_name
+
+def rename_childs_v_group(rig, name, new_name):
+    for c in rig.children:
+        rename_v_group(c, name, new_name)
+
+
+def show_layers(rig, animation_ready):
+    layers = rig.data.layers
+    visible_layers = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18, 28]
+    if animation_ready:
+        visible_layers = [0, 3, 5, 7, 10, 13, 16, 28]
+    set_array_indices(layers, visible_layers)
+    return
