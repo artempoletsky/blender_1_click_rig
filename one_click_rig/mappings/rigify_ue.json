@@ -62,17 +62,17 @@
     "forearm.R.001": "lowerarm_twist_01_r",
     "hand.R": "hand_r"
   },
-  
+
   {
-    "thig.L": "thigh_l",
-    "thig.L.001": "thigh_twist_01_l",
+    "thigh.L": "thigh_l",
+    "thigh.L.001": "thigh_twist_01_l",
     "shin.L": "calf_l",
     "shin.L.001": "calf_twist_01_l",
     "foot.L": "foot_l",
     "toe.L": "ball_l",
 
-    "thig.R": "thigh_r",
-    "thig.R.001": "thigh_twist_01_r",
+    "thigh.R": "thigh_r",
+    "thigh.R.001": "thigh_twist_01_r",
     "shin.R": "calf_r",
     "shin.R.001": "calf_twist_01_r",
     "foot.R": "foot_r",

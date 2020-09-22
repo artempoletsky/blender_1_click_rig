@@ -5,8 +5,8 @@ from . import bone_functions as b_fun
 oops = bpy.ops.object
 
 mapping = [
-    ('thig_fk.L', 'thigh_l', 'rot'),
-    ('thig_fk.R', 'thigh_r', 'rot'),
+    ('thigh_fk.L', 'thigh_l', 'rot'),
+    ('thigh_fk.R', 'thigh_r', 'rot'),
     ('shin_fk.L', 'calf_l', 'rot'),
     ('shin_fk.R', 'calf_r', 'rot'),
     ('foot_fk.L', 'foot_l', 'rot'),
@@ -93,7 +93,7 @@ def create_helper_bones(source_armature, rig, mapping):
 
 # def create_rotation_constraint(source_armature, rig, source_bone, rig_bone):
     # return
-ik_prop_bones = ['thig_parent.L', 'thig_parent.R', 'upper_arm_parent.L', 'upper_arm_parent.R']
+ik_prop_bones = ['thigh_parent.L', 'thigh_parent.R', 'upper_arm_parent.L', 'upper_arm_parent.R']
 def set_ik_fk(rig, value):
     for n in ik_prop_bones:
         rig.pose.bones[n]['IK_FK'] = value

@@ -98,6 +98,8 @@ class AddUnrealSkeletonOperator(bpy.types.Operator):
         rig_parents = {}
         for b in def_bones:
             name = mapping.get_name(b.name.strip(def_prefix))
+            if name in eb:
+                eb[name].name = 'rig.' + name
             b_fun.rename_childs_v_group(rig, b.name, name)
             parent_name = b.parent.name if b.parent else None
             if parent_name:

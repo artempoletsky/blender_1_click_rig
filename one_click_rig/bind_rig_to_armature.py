@@ -60,7 +60,7 @@ def fix_twist_bones(context, rig):
     oops.mode_set(mode = 'EDIT')
 
     twist_bones = ['thigh_twist_01_l','thigh_twist_01_r','upperarm_twist_01_l','upperarm_twist_01_r']
-    parent_bones = ['DEF-thig.L','DEF-thig.R','DEF-upper_arm.L','DEF-upper_arm.R']
+    parent_bones = ['DEF-thigh.L','DEF-thigh.R','DEF-upper_arm.L','DEF-upper_arm.R']
     for i, b in enumerate(twist_bones):
         rig.data.edit_bones[b + '.copy'].parent = rig.data.edit_bones[parent_bones[i]]
 
@@ -105,16 +105,16 @@ def set_ik_follow_bone(context, rig, value):
         copy_loc.subtarget = value
     return
 
-ik_prop_bones = ['thig_parent.L', 'thig_parent.R', 'upper_arm_parent.L', 'upper_arm_parent.R']
+ik_prop_bones = ['thigh_parent.L', 'thigh_parent.R', 'upper_arm_parent.L', 'upper_arm_parent.R']
 # ik_bones = [
-#     '["thig_ik.L", "MCH-shin_ik.L", "MCH-thig_ik_target.L"]',
-#     '["thig_ik.R", "MCH-shin_ik.R", "MCH-thig_ik_target.R"]',
+#     '["thigh_ik.L", "MCH-shin_ik.L", "MCH-thigh_ik_target.L"]',
+#     '["thigh_ik.R", "MCH-shin_ik.R", "MCH-thigh_ik_target.R"]',
 #     '["upper_arm_ik.L", "MCH-forearm_ik.L", "MCH-upper_arm_ik_target.L"]',
 #     '["upper_arm_ik.R", "MCH-forearm_ik.R", "MCH-upper_arm_ik_target.R"]',
 # ]
 # ctrl_bones = [
-#     '["thig_ik.L", "foot_ik.L", "thig_ik_target.L"]',
-#     '["thig_ik.R", "foot_ik.R", "thig_ik_target.R"]',
+#     '["thigh_ik.L", "foot_ik.L", "thigh_ik_target.L"]',
+#     '["thigh_ik.R", "foot_ik.R", "thigh_ik_target.R"]',
 #     '["upper_arm_ik.L", "hand_ik.L", "upper_arm_ik_target.L"]',
 #     '["upper_arm_ik.R", "hand_ik.R", "upper_arm_ik_target.R"]',
 # ]
@@ -142,8 +142,8 @@ def fix_poles(context, rig):
     #     rig.pose.bones[b]["pole_vector"] = 1
     oops.mode_set(mode = 'EDIT')
     eb = rig.data.edit_bones
-    poles = ['thig_ik_target.L', 'thig_ik_target.R', 'upper_arm_ik_target.R', 'upper_arm_ik_target.R']
-    ik_bones = ['thig_ik.L', 'thig_ik.R', 'upper_arm_ik.R', 'upper_arm_ik.R']
+    poles = ['thigh_ik_target.L', 'thigh_ik_target.R', 'upper_arm_ik_target.R', 'upper_arm_ik_target.R']
+    ik_bones = ['thigh_ik.L', 'thigh_ik.R', 'upper_arm_ik.R', 'upper_arm_ik.R']
     for i, b in enumerate(poles):
         pole = eb[b]
         ik = eb[ik_bones[i]]
