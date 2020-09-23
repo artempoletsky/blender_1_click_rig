@@ -120,9 +120,9 @@ def create_constraints(source_armature, rig, mapping):
             constr.target_space = constr.owner_space = 'LOCAL_WITH_PARENT'
 
 class RetargetAnimationOperator(bpy.types.Operator):
-    """RetargetAnimationOperator"""
+    """Select imported skeleton with animation and rigify rig. Operator will retarget animation to rig"""
     bl_idname = "object.ocr_retarget_animation"
-    bl_label = "One click retarget animation"
+    bl_label = "(OCR) retarget animation"
     bl_options = {'REGISTER', 'UNDO'}
 
     # example_prop: bpy.props.BoolProperty(name="Example prop", default=False)
@@ -136,12 +136,7 @@ class RetargetAnimationOperator(bpy.types.Operator):
 
     def execute(self, context):
         selected = context.selected_objects
-        if 'rig_id' in selected[0].data:
-            rig = selected[0]
-            source = selected[1]
-        else:
-            rig = selected[1]
-            source = selected[0]
+        rig, source = b_fun.get_rig_and_armature(context)
 
         create_helper_bones(source, rig, mapping)
         create_constraints(source, rig, mapping)

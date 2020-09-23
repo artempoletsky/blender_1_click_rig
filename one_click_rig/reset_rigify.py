@@ -7,7 +7,7 @@ pops = bpy.ops.pose
 aops = bpy.ops.armature
 
 class ResetRigifyOperator(bpy.types.Operator):
-    """Remove one click rig skeleton from rigidy rig"""
+    """Remove one click rig skeleton from the rigify rig"""
     bl_idname = "object.ocr_reset_rigify"
     bl_label = "Reset rigify"
     bl_options = {'REGISTER', 'UNDO'}
@@ -24,6 +24,9 @@ class ResetRigifyOperator(bpy.types.Operator):
 
     def execute(self, context):
         rig = context.view_layer.objects.active
+        if  not 'one_click_rig' in rig.data:
+            self.report({'ERROR'}, 'Rig doesn\'t contain one click rig armature')
+            return {'FINISHED'}
         oops.mode_set(mode = 'EDIT')
         b_fun.switch_to_layer(rig.data, 24)
 

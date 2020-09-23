@@ -314,8 +314,8 @@ def create_arm(suffix, source_armature, object, layer = 0):
 
 
 class GenerateMetarigOperator(bpy.types.Operator):
-    """GenerateMetarigOperator"""
-    bl_idname = "object.ap_rig_tools_generate_metarig"
+    """Select an armature. Operator will create new metarig from the armature."""
+    bl_idname = "object.ocr_generate_metarig"
     bl_label = "Generate metarig from armature"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -358,7 +358,7 @@ class GenerateMetarigOperator(bpy.types.Operator):
         params.make_widget = False
         bone, params = add_single_bone('clavicle_r', 'spine_03', source_armature, context.object, direction_bone_name = 'upperarm_r', layer = 3)
         params.make_widget = False
-        
+
         add_single_bone('breast_l', 'spine_02', source_armature, context.object, layer = 3)
         add_single_bone('breast_r', 'spine_02', source_armature, context.object, layer = 3)
 

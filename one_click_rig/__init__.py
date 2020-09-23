@@ -40,6 +40,7 @@ if "bpy" in locals():
     importlib.reload(add_unreal_skeleton)
     AddUnrealSkeletonOperator = add_unreal_skeleton.AddUnrealSkeletonOperator
     SaveSkeletonDataOperator = add_unreal_skeleton.SaveSkeletonDataOperator
+    importlib.reload(panel)
 
 else:
     from . import preferences
@@ -56,6 +57,7 @@ else:
     from .retarget_animation import RetargetAnimationOperator
     from .reset_rigify import ResetRigifyOperator
     from .add_unreal_skeleton import AddUnrealSkeletonOperator, SaveSkeletonDataOperator
+    from . import panel
 
 import bpy
 
@@ -76,6 +78,7 @@ classes = (
     ResetRigifyOperator,
     AddUnrealSkeletonOperator,
     SaveSkeletonDataOperator,
+    panel.OCR_PT_OcrPanel,
 )
 
 def vertex_menu_draw(self, context):

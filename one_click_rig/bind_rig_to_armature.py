@@ -216,8 +216,8 @@ def create_copy_bones(context, rig):
     return
 
 class BindRigifyToArmatureOperator(bpy.types.Operator):
-    """Empty operator"""
-    bl_idname = "object.bind_rigify_to_armature"
+    """Select an armature and a rigify rig. Operator will copy the armature to the rig and binds them"""
+    bl_idname = "object.ocr_bind_rigify_to_armature"
     bl_label = "Bind rigify rig to armature"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -234,12 +234,7 @@ class BindRigifyToArmatureOperator(bpy.types.Operator):
             and context.object.mode == 'OBJECT')
 
     def execute(self, context):
-        selected = context.selected_objects
-        rig = context.view_layer.objects.active
-        rig.show_in_front = True
-        rig.name = 'Armature'
-        selected.remove(rig)
-        armature = selected[0]
+        rig, armature = b_fun.get_rig_and_armature(context)
 
         copy_armature(context, rig, armature)
         create_copy_bones(context, rig)

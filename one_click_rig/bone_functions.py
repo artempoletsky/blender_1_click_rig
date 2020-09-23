@@ -51,3 +51,14 @@ def show_layers(rig, animation_ready):
         visible_layers = [0, 3, 5, 7, 10, 13, 16, 28]
     set_array_indices(layers, visible_layers)
     return
+
+
+def get_rig_and_armature(context):
+    selected = context.selected_objects
+    if 'rig_id' in selected[0].data:
+        rig = selected[0]
+        source = selected[1]
+    else:
+        rig = selected[1]
+        source = selected[0]
+    return rig, source

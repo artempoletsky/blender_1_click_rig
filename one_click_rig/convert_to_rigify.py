@@ -6,7 +6,7 @@ pops = bpy.ops.pose
 
 class ConvertToRigifyOperator(bpy.types.Operator):
     """Convert character to rigify"""
-    bl_idname = "object.convert_to_rigify"
+    bl_idname = "object.ocr_convert_to_rigify"
     bl_label = "Convert UE character to rigify"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -32,7 +32,7 @@ class ConvertToRigifyOperator(bpy.types.Operator):
         if parent:
             parent.select_set(False)
         mesh_object.select_set(False)
-        oops.ap_rig_tools_generate_metarig()
+        oops.ocr_generate_metarig()
         metarig = context.object
         oops.mode_set(mode = 'OBJECT')
         pops.rigify_generate()

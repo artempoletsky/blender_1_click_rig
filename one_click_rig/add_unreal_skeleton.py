@@ -83,7 +83,7 @@ class AddUnrealSkeletonOperator(bpy.types.Operator):
         rig = context.view_layer.objects.active
 
         if 'one_click_rig' in rig.data:
-            self.report({'WARNING'}, 'Rig is already contains unreal skeleton')
+            self.report({'ERROR'}, 'Rig is already contains unreal skeleton')
             return {'FINISHED'}
         oops.mode_set(mode = 'EDIT')
 
