@@ -3,7 +3,7 @@ from . import preferences
 
 class ArrangeBonesOperator(bpy.types.Operator):
     """Tail to head"""
-    bl_idname = "armature.arrange_bones"
+    bl_idname = "armature.ocr_arrange_bones"
     bl_label = "Arrange bones"
     bl_options = {'REGISTER', 'UNDO'}
 

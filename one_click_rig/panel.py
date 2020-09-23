@@ -9,10 +9,7 @@ class OCR_PT_OcrPanel(bpy.types.Panel):
     bl_region_type = 'UI'
     bl_category = 'Rigify'
 
-    def draw(self, context):
-        layout = self.layout
-        col = layout.column()
-
+    def draw_object(self, col, context):
         col.label(text="Converting to Rigify operators:")
         row = col.row()
         row.operator("object.ocr_convert_to_rigify")
@@ -37,3 +34,37 @@ class OCR_PT_OcrPanel(bpy.types.Panel):
 
         row = col.row()
         row.operator("object.ocr_retarget_animation", text = 'Retarget animation')
+
+    def draw_edit(self, col, context):
+        col.label(text="Armature editing operators:")
+        row = col.row()
+        row.operator("armature.ocr_arrange_bones")
+
+        row = col.row()
+        row.operator("armature.ocr_clear_empty_bones")
+
+        row = col.row()
+        row.operator("armature.ocr_swap_bones_weights")
+
+        row = col.row()
+        row.operator("armature.ocr_merge_bones_with_vgroups")
+
+    def draw_pose(self, col, context):
+        col.label(text="Armature editing operators:")
+
+        row = col.row()
+        row.operator("armature.ocr_swap_bones_weights")
+
+        row = col.row()
+        row.operator("armature.ocr_merge_bones_with_vgroups")
+
+    def draw(self, context):
+        layout = self.layout
+        col = layout.column()
+        mode = context.object.mode
+        if mode == 'OBJECT':
+            self.draw_object(col, context)
+        elif mode == 'EDIT':
+            self.draw_edit(col, context)
+        elif mode == 'POSE':
+            self.draw_pose(col, context)

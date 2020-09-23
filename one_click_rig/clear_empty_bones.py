@@ -19,12 +19,12 @@ def is_vgroup_empty(object, vg_name, check_vertices, delete_if_empty):
 
 class ClearEmptyBonesOperator(bpy.types.Operator):
     """Clear empty bones"""
-    bl_idname = "armature.clear_empty_bones"
+    bl_idname = "armature.ocr_clear_empty_bones"
     bl_label = "Clear empty bones"
     bl_options = {'REGISTER', 'UNDO'}
 
     selected_only: bpy.props.BoolProperty(name="Selected only", default=False)
-    remove_empty_groups: bpy.props.BoolProperty(name="Remove empty vertex groups", default=False)
+    remove_empty_groups: bpy.props.BoolProperty(name="Remove bones with empty vertex groups", default=False)
 
     @classmethod
     def poll(cls, context):

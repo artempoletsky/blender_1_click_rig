@@ -25,7 +25,7 @@ def merge_vgroups(object, vg_from, vg_to):
 
 class MergeBonesOperator(bpy.types.Operator):
     """Merge bones"""
-    bl_idname = "armature.merge_bones_with_vgroups"
+    bl_idname = "armature.ocr_merge_bones_with_vgroups"
     bl_label = "Merge bones with vertex groups"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -37,10 +37,12 @@ class MergeBonesOperator(bpy.types.Operator):
             # and len(context.selected_objects) > 0
             and context.view_layer.objects.active
             and context.object.type == 'ARMATURE'
-            and context.object.mode == 'EDIT')
+            and context.object.mode in ['EDIT', 'POSE'])
 
     def execute(self, context):
         armature = context.object
+        mode = context.object.mode
+        oops.mode_set(mode = 'EDIT')
         bones = context.object.data.edit_bones
 
         selected_bones = [bone for bone in context.selected_bones]
@@ -79,8 +81,9 @@ class MergeBonesOperator(bpy.types.Operator):
         active_bone.select = True
         active_bone.select_head = True
         active_bone.select_tail = True
-        oops.posemode_toggle()
+        
         # self.prefs = preferences.get_prefs()
+        oops.mode_set(mode = 'POSE')
 
         # self.report({'INFO'}, self.prefs.hello)
         return {'FINISHED'}
