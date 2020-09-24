@@ -59,6 +59,8 @@ class OCR_PT_OcrPanel(bpy.types.Panel):
         row.operator("armature.ocr_merge_bones_with_vgroups")
 
     def draw(self, context):
+        if not context.object:
+            return
         layout = self.layout
         col = layout.column()
         mode = context.object.mode

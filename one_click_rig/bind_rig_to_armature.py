@@ -4,9 +4,10 @@ from .map_bones import BoneMapping
 from . import preferences
 
 from . import bone_functions as b_fun
+from . import bl_info
 
 def tag_rig(rig):
-    rig.data['one_click_rig'] = bpy.context.window_manager.one_click_rig_version
+    rig.data['one_click_rig'] = bl_info['version']
 
 oops = bpy.ops.object
 aops = bpy.ops.armature

@@ -37,7 +37,7 @@ class ConvertToRigifyOperator(bpy.types.Operator):
         oops.mode_set(mode = 'OBJECT')
         pops.rigify_generate()
         armature_object.select_set(True)
-        oops.bind_rigify_to_armature()
+        oops.ocr_bind_rigify_to_armature()
 
         objs = bpy.data.objects
 
