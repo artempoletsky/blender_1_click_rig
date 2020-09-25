@@ -62,3 +62,9 @@ def get_rig_and_armature(context):
         rig = selected[1]
         source = selected[0]
     return rig, source
+
+
+ik_prop_bones = ['thigh_parent.L', 'thigh_parent.R', 'upper_arm_parent.L', 'upper_arm_parent.R']
+def set_ik_fk(rig, value):
+    for n in ik_prop_bones:
+        rig.pose.bones[n]['IK_FK'] = value
