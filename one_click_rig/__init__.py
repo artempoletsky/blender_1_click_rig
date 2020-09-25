@@ -83,6 +83,11 @@ classes = (
     panel.OCR_PT_OcrPanel,
     mapping_editor.MappingEntry,
     mapping_editor.MappingEditorOperator,
+    mapping_editor.OCR_PT_BoneMappingsPanel,
+    mapping_editor.OCRMappingPanelProps,
+    mapping_editor.MappingRemoveEntryOperator,
+    mapping_editor.MappingAddEntryOperator,
+    mapping_editor.SaveMappingOperator,
 )
 
 def vertex_menu_draw(self, context):
@@ -104,7 +109,7 @@ def register():
 
     # version = ".".join(str(x) for x in bl_info["version"])
 
-    # bpy.types.WindowManager.one_click_rig_version = bpy.props.StringProperty(name = 'One_click_rig', default = version)
+    bpy.types.WindowManager.one_click_rig_ui = bpy.props.PointerProperty(type = mapping_editor.OCRMappingPanelProps)
     preferences.register_keymaps()
     bpy.types.VIEW3D_MT_edit_mesh_vertices.append(vertex_menu_draw)
     bpy.types.VIEW3D_MT_edit_mesh_context_menu.append(vertext_context_menu_func)

@@ -166,8 +166,7 @@ def disable_stretch(context, rig):
 
 def create_copy_bones(context, rig):
 
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    mapping = BoneMapping(dir_path + '/mappings/rigify_ue.json', True)
+    mapping = BoneMapping('rigify_uemannequin', True)
 
     oops.mode_set(mode = 'EDIT')
     aops.select_all(action = 'SELECT')

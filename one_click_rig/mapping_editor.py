@@ -1,8 +1,9 @@
 import bpy
 import re
 from . import preferences
+import os
 
-from . import bl_info
+from . import map_bones
 
 class MappingEntry(bpy.types.PropertyGroup):
     bone_from: bpy.props.StringProperty()
@@ -149,3 +150,151 @@ class MappingEditorOperator(bpy.types.Operator):
             subcol.prop(e, 'bone_to',  text = '')
 
             i += 1
+
+# def load_active_mapping(ui)
+
+
+class MappingRemoveEntryOperator(bpy.types.Operator):
+    """Remove entry"""
+    bl_idname = "object.ocr_mapping_remove_entry"
+    bl_label = "Remove entry"
+    # bl_options = {'REGISTER', 'UNDO'}
+
+    index: bpy.props.IntProperty()
+
+    def execute(self, context):
+        ui = context.window_manager.one_click_rig_ui
+        mapping_entries = ui.mapping_entries
+        mapping_entries.remove(self.index)
+        return {'FINISHED'}
+
+
+class MappingAddEntryOperator(bpy.types.Operator):
+    """Add entry"""
+    bl_idname = "object.ocr_mapping_add_entry"
+    bl_label = "Add entry"
+    # bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        ui = context.window_manager.one_click_rig_ui
+        mapping_entries = ui.mapping_entries
+        mapping_entries.add()
+        return {'FINISHED'}
+
+class SaveMappingOperator(bpy.types.Operator):
+    """Save mapping"""
+    bl_idname = "object.ocr_mapping_save"
+    bl_label = "Save mapping"
+    # bl_options = {'REGISTER', 'UNDO'}
+
+    # name: bpy.props.StringProperty()
+
+    def execute(self, context):
+        ui = context.window_manager.one_click_rig_ui
+        mapping_entries = ui.mapping_entries
+        data = [[e.bone_from, e.bone_to] for e in mapping_entries]
+        map_bones.save_mapping(ui.new_mapping_name, data)
+        return {'FINISHED'}
+
+class RemoveMappingOperator(bpy.types.Operator):
+    """Save mapping"""
+    bl_idname = "object.ocr_mapping_save"
+    bl_label = "Save mapping"
+    # bl_options = {'REGISTER', 'UNDO'}
+
+    # name: bpy.props.StringProperty()
+
+    def execute(self, context):
+        ui = context.window_manager.one_click_rig_ui
+        mapping_entries = ui.mapping_entries
+        data = [[e.bone_from, e.bone_to] for e in mapping_entries]
+        map_bones.save_mapping(ui.new_mapping_name, data)
+        return {'FINISHED'}
+
+
+
+class OCRMappingPanelProps(bpy.types.PropertyGroup):
+
+
+    def update_edit_mapping(self, value):
+        if value:
+            self.load_active_mapping()
+            self.new_mapping_name = self.active_mapping
+
+    def update_active_mapping(self, value):
+        self.update_edit_mapping(self.edit_mapping)
+
+    def load_active_mapping(self):
+        data = map_bones.load_mapping(self.active_mapping)
+
+        self.mapping_entries.clear()
+        for key, value in data:
+            entry = self.mapping_entries.add()
+            entry.bone_from = key
+            entry.bone_to = value
+
+    active_mapping: bpy.props.EnumProperty(
+        name = "Mapping",
+        description = "Saved mappings",
+        items = map_bones.get_mappings,
+        update = update_active_mapping,
+        default = None
+        )
+
+    edit_mapping: bpy.props.BoolProperty(
+        name = "Edit mapping",
+        default = False,
+        update = update_edit_mapping
+        )
+
+    new_mapping_name: bpy.props.StringProperty()
+    mapping_entries:bpy.props.CollectionProperty(type=MappingEntry)
+
+
+class OCR_PT_BoneMappingsPanel(bpy.types.Panel):
+    """
+    Addon panel
+    """
+    bl_label = 'Bone mappings'
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'Rigify'
+
+    def draw_mapping(self, col, ui):
+        # main_rows = layout.row()
+
+        # print(get_bone_type(bones1[0].name))
+        # print(get_bone_type(bones2[0].name))
+        i = 0
+        for e in ui.mapping_entries:
+
+            row = col.row()
+            subcol = row.column()
+            # subcol.label(text = name1)
+            subcol.prop(e, 'bone_from', text = '')
+            subcol = row.column()
+            subcol.prop(e, 'bone_to',  text = '')
+            subcol = row.column()
+            prop = subcol.operator('object.ocr_mapping_remove_entry', icon = 'X', text = '')
+            prop.index = i
+            # row.separator()
+            # subcol.separator()
+
+            i += 1
+        col.operator('object.ocr_mapping_add_entry')
+        col.separator()
+        col.prop(ui, 'new_mapping_name')
+        col.operator('object.ocr_mapping_save')
+        return
+
+    def draw(self, context):
+
+        layout = self.layout
+        col = layout.column()
+        ui = context.window_manager.one_click_rig_ui
+
+        col.prop(ui, 'active_mapping')
+        col.prop(ui, "edit_mapping", toggle=True)
+
+        if ui.edit_mapping:
+            self.draw_mapping(col, ui)

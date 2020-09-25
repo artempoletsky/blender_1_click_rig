@@ -77,8 +77,7 @@ class AddUnrealSkeletonOperator(bpy.types.Operator):
             and (context.object.mode == 'OBJECT'))
 
     def execute(self, context):
-        dir_path = os.path.dirname(os.path.realpath(__file__))
-        mapping = BoneMapping(dir_path + '/mappings/rigify_ue.json', False)
+        mapping = BoneMapping('rigify_uemannequin', False)
 
         rig = context.view_layer.objects.active
 

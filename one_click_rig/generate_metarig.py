@@ -328,8 +328,7 @@ class GenerateMetarigOperator(bpy.types.Operator):
             and (context.object.mode == 'OBJECT'))
 
     def execute(self, context):
-        dir_path = os.path.dirname(os.path.realpath(__file__))
-        mapping = BoneMapping(dir_path + '/mappings/rigify_ue.json', True)
+        mapping = BoneMapping('rigify_uemannequin', True)
         # mapping = None
         location = context.object.location
         source_object = context.object
