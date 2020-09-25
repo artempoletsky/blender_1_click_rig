@@ -236,6 +236,8 @@ class BindRigifyToArmatureOperator(bpy.types.Operator):
     def execute(self, context):
         rig, armature = b_fun.get_rig_and_armature(context)
 
+        rig.name = 'Armature'
+
         copy_armature(context, rig, armature)
         create_copy_bones(context, rig)
         fix_twist_bones(context, rig)

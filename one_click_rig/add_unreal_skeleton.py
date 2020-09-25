@@ -55,6 +55,7 @@ class AddUnrealSkeletonOperator(bpy.types.Operator):
         mapping = BoneMapping('rigify_uemannequin', False)
 
         rig = context.view_layer.objects.active
+        rig.name = 'Armature'
 
         if 'one_click_rig' in rig.data:
             self.report({'ERROR'}, 'Rig is already contains unreal skeleton')
