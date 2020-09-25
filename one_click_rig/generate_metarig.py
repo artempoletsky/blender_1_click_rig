@@ -192,12 +192,17 @@ def create_spine(source_armature, object):
     neck_position = get_bone_position(source_armature, 'neck_01')
     bones[-1].tail = neck_position
 
+    for bone in bones:
+        b_fun.align_bone_x_axis(bone, Vector((1, 0, 0)))
+
     set_rigify_type(object, 'pelvis', 'spines.basic_spine', 4, 4)
 
 def create_head(source_armature, object):
     bones = ['neck_01', 'head']
     bones = create_bone_chain(bones, source_armature, object, layer = 3, parent_name = 'spine_03')
     align_bone_to_vector(bones[-1], Vector((0, 0, 1)))
+    for bone in bones:
+        b_fun.align_bone_x_axis(bone, Vector((1, 0, 0)))
     set_rigify_type(object, 'neck_01', 'spines.super_head', 4, 4)
 
 def get_finger_end_point(object, vgroup_name, bone_head):
@@ -294,10 +299,14 @@ def create_arm(suffix, source_armature, object, layer = 0):
     spine = ['upperarm_' + suffix, 'lowerarm_' + suffix, 'hand_' + suffix]
     bones = create_bone_chain(spine, source_armature, object, layer = layer, parent_name = 'clavicle_' + suffix)
     # align_bone_to_vector(bones[-1], saved_x_axises['hand_' + suffix])
-    b_fun.align_bone_x_axis(bones[-1], saved_y_axises['hand_' + suffix])
     b_fun.align_bone_x_axis(bones[1], -saved_z_axises[bones[1].name])
     b_fun.align_bone_x_axis(bones[0], -saved_z_axises[bones[0].name])
-    set_rigify_type(object, 'upperarm_' + suffix, 'limbs.super_limb', layer + 1, layer + 2)
+    middle = get_bone_position(source_armature, 'middle_01_' + suffix)
+    if middle:
+        align_bone_to_point(bones[-1], middle)
+    b_fun.align_bone_x_axis(bones[-1], saved_y_axises['hand_' + suffix])
+    params = set_rigify_type(object, 'upperarm_' + suffix, 'limbs.super_limb', layer + 1, layer + 2)
+    params.rotation_axis = 'x'
 
 
 class GenerateMetarigOperator(bpy.types.Operator):
