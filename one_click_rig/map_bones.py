@@ -14,8 +14,7 @@ def get_mapping_file(mapping):
     return mappings_folder + mapping + '.json'
 
 def has_mapping(mapping):
-    names = [name.rstrip('.json') for name in os.listdir(mappings_folder) if name.endswith('.json')]
-    return mapping in names
+    return os.path.exists(get_mapping_file(mapping))
 
 def load_mapping(mapping):
     file = get_mapping_file(mapping)
@@ -28,6 +27,9 @@ def save_mapping(mapping, data):
     file = get_mapping_file(mapping)
     with open(file, 'w') as outfile:
         json.dump(data, outfile, indent=2, separators=(',', ': '))
+
+def remove_mapping(mapping):
+    os.remove(get_mapping_file(mapping))
 
 class BoneMapping(object):
     """Map bones names from different rigs"""

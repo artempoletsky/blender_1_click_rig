@@ -184,7 +184,7 @@ class MappingAddEntryOperator(bpy.types.Operator):
 class SaveMappingOperator(bpy.types.Operator):
     """Save mapping"""
     bl_idname = "object.ocr_mapping_save"
-    bl_label = "Save mapping"
+    bl_label = "Owerwrite mapping?"
     # bl_options = {'REGISTER', 'UNDO'}
 
     # name: bpy.props.StringProperty()
@@ -194,22 +194,32 @@ class SaveMappingOperator(bpy.types.Operator):
         mapping_entries = ui.mapping_entries
         data = [[e.bone_from, e.bone_to] for e in mapping_entries]
         map_bones.save_mapping(ui.new_mapping_name, data)
+        ui.active_mapping = ui.new_mapping_name
         return {'FINISHED'}
+
+    def invoke(self, context, event):
+        ui = context.window_manager.one_click_rig_ui
+        if map_bones.has_mapping(ui.new_mapping_name):
+            return context.window_manager.invoke_confirm(self, event)
+        else:
+            return self.execute(context)
 
 class RemoveMappingOperator(bpy.types.Operator):
-    """Save mapping"""
-    bl_idname = "object.ocr_mapping_save"
-    bl_label = "Save mapping"
+    """Remove mapping"""
+    bl_idname = "object.ocr_mapping_remove"
+    bl_label = "Remove mapping?"
     # bl_options = {'REGISTER', 'UNDO'}
 
     # name: bpy.props.StringProperty()
 
     def execute(self, context):
         ui = context.window_manager.one_click_rig_ui
-        mapping_entries = ui.mapping_entries
-        data = [[e.bone_from, e.bone_to] for e in mapping_entries]
-        map_bones.save_mapping(ui.new_mapping_name, data)
+        map_bones.remove_mapping(ui.active_mapping)
+        ui.reset_active_mapping()
         return {'FINISHED'}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
 
 
 
@@ -232,6 +242,9 @@ class OCRMappingPanelProps(bpy.types.PropertyGroup):
             entry = self.mapping_entries.add()
             entry.bone_from = key
             entry.bone_to = value
+
+    def reset_active_mapping(self):
+        self.active_mapping = map_bones.get_mappings(self, None)[0][0]
 
     active_mapping: bpy.props.EnumProperty(
         name = "Mapping",
@@ -283,8 +296,10 @@ class OCR_PT_BoneMappingsPanel(bpy.types.Panel):
             i += 1
         col.operator('object.ocr_mapping_add_entry')
         col.separator()
-        col.prop(ui, 'new_mapping_name')
-        col.operator('object.ocr_mapping_save')
+        col.label(text = 'New mapping name')
+        col.prop(ui, 'new_mapping_name', text = '')
+        col.separator()
+        col.operator('object.ocr_mapping_save', text = 'Save mapping')
         return
 
     def draw(self, context):
@@ -295,6 +310,7 @@ class OCR_PT_BoneMappingsPanel(bpy.types.Panel):
 
         col.prop(ui, 'active_mapping')
         col.prop(ui, "edit_mapping", toggle=True)
+        col.operator("object.ocr_mapping_remove", text = 'Remove mapping')
 
         if ui.edit_mapping:
             self.draw_mapping(col, ui)
