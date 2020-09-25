@@ -51,8 +51,21 @@ class PoseCharacterOperator(bpy.types.Operator):
         pose_bones = rig.pose.bones
         b_fun.set_ik_fk(rig, 1.0)
         matrices = load_pose('ue_mannequin')
+        affected_bones = [bone for bone in pose_bones if bone.name in matrices]
+        # while len(affected_bones):
+        #     bone = affected_bones[0]
+        #     while bone.parent:
+        #         bone = bone.parent
+        #     affected_bones.remove(bone)
+        #     bone.matrix = matrices[bone.name]
         for bone, matrix in matrices.items():
-            pose_bones[bone].matrix = matrix
+            t = Matrix.Translation(pose_bones[bone].matrix.to_translation())
+            # r = pose_bones[bone].matrix.to_quaternion().to_matrix().to_4x4()
+            r = matrix.to_quaternion().to_matrix().to_4x4()
+            s = Matrix.Scale(1, 4, pose_bones[bone].matrix.to_scale())
+            # print(t)
+
+            pose_bones[bone].matrix = t @ s @ r
         return {'FINISHED'}
 
 
