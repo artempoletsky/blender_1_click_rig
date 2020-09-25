@@ -5,6 +5,8 @@ import os
 
 from . import map_bones
 
+oops = bpy.ops.object
+
 class MappingEntry(bpy.types.PropertyGroup):
     bone_from: bpy.props.StringProperty()
     bone_to: bpy.props.StringProperty()
@@ -189,7 +191,7 @@ class RemoveMappingOperator(bpy.types.Operator):
 
 class RenameArmatureOperator(bpy.types.Operator):
     """Rename armature by mapping"""
-    bl_idname = "object.ocr_rename_armature"
+    bl_idname = "armature.ocr_rename_armature"
     bl_label = "Rename armature"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -202,6 +204,44 @@ class RenameArmatureOperator(bpy.types.Operator):
         ui = context.window_manager.one_click_rig_ui
         mapping = map_bones.BoneMapping(ui.active_mapping, ui.rename_reverse)
         mapping.rename_armature(context.object.data)
+        return {'FINISHED'}
+
+class AddPrefixOperator(bpy.types.Operator):
+    """Add prefix"""
+    bl_idname = "armature.ocr_add_prefix"
+    bl_label = "Add prefix"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    prefix: bpy.props.StringProperty(default = 'DEF-')
+
+    @classmethod
+    def poll(cls, context):
+        return (context.space_data.type == 'VIEW_3D'
+            and context.view_layer.objects.active)
+
+    def execute(self, context):
+        oops.mode_set(mode = 'EDIT')
+        for bone in context.object.data.edit_bones:
+            bone.name = self.prefix + bone.name
+        return {'FINISHED'}
+
+class RemovePrefixOperator(bpy.types.Operator):
+    """Remove prefix"""
+    bl_idname = "armature.ocr_remove_prefix"
+    bl_label = "Remove prefix"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    prefix: bpy.props.StringProperty(default = 'DEF-')
+
+    @classmethod
+    def poll(cls, context):
+        return (context.space_data.type == 'VIEW_3D'
+            and context.view_layer.objects.active)
+
+    def execute(self, context):
+        oops.mode_set(mode = 'EDIT')
+        for bone in context.object.data.edit_bones:
+            bone.name = re.sub('^'+self.prefix, '', bone.name)
         return {'FINISHED'}
 
 
@@ -306,6 +346,10 @@ class OCR_PT_BoneMappingsPanel(bpy.types.Panel):
         else:
             col.separator()
             row = col.row()
-            row.operator("object.ocr_rename_armature")
+            row.operator("armature.ocr_rename_armature")
             row.prop(ui, 'rename_reverse')
+            col.separator()
+            row = col.row()
+            row.operator("armature.ocr_add_prefix")
+            row.operator("armature.ocr_remove_prefix")
             # props.name = ui.active_mapping

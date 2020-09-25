@@ -86,6 +86,8 @@ classes = (
     mapping_editor.SaveMappingOperator,
     mapping_editor.RemoveMappingOperator,
     mapping_editor.RenameArmatureOperator,
+    mapping_editor.AddPrefixOperator,
+    mapping_editor.RemovePrefixOperator,
 )
 
 def vertex_menu_draw(self, context):

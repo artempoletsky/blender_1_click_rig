@@ -270,7 +270,8 @@ def create_finger(name, suffix, source_object, object):
     align_bone_x_axis(bones[2], saved_z_axises[bones[2].name])
 
 
-    set_rigify_type(object, name + '_01_' + suffix, 'limbs.super_finger', 6, 6)
+    params = set_rigify_type(object, name + '_01_' + suffix, 'limbs.super_finger', 6, 6)
+    params.primary_rotation_axis = 'X'
 
 
 def create_leg(suffix, source_object, object, layer = 0):
