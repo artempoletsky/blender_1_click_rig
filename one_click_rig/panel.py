@@ -26,6 +26,8 @@ class OCR_PT_OcrPanel(bpy.types.Panel):
         col.label(text="Converting from Rigify operators:")
 
         row = col.row()
+        row.operator("pose.ocr_pose_character")
+        row = col.row()
         row.operator("object.ocr_add_unreal_skeleton")
         row = col.row()
         row.operator("object.ocr_reset_rigify")

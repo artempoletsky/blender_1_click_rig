@@ -5,7 +5,7 @@ from . import preferences
 from . import bone_functions as b_fun
 from . import bind_rig_to_armature as bind
 from .map_bones import BoneMapping
-from mathutils import Matrix, Vector
+from . import templates
 
 oops = bpy.ops.object
 pops = bpy.ops.pose
@@ -33,31 +33,6 @@ def link_parents(rig, bones, parents, rig_parents):
             b.parent = eb[parents[b.name]]
         elif b.name in rig_parents:
             b.parent = eb[rig_parents[b.name]]
-
-
-def get_matrices(ue_skeleton):
-    result = {}
-    for bone in ue_skeleton.data.edit_bones:
-        result[bone.name] = bone.matrix.copy()
-    return result
-
-
-def get_iks(ue_skeleton):
-    result = []
-    for bone in ue_skeleton.data.edit_bones:
-        if bone.name.startswith('ik'):
-            result.append({
-                'name': bone.name,
-                'head': bone.head.copy(),
-                'tail': bone.tail.copy(),
-            })
-    return result
-
-def get_parents(ue_skeleton):
-    result = {}
-    for bone in ue_skeleton.data.edit_bones:
-        result[bone.name] = bone.parent.name if bone.parent else 'root'
-    return result
 
 
 class AddUnrealSkeletonOperator(bpy.types.Operator):
@@ -93,7 +68,7 @@ class AddUnrealSkeletonOperator(bpy.types.Operator):
         def_prefix = 'DEF-'
         org_prefix = 'ORG-'
         def_bones = [b for b in eb if b.name.startswith(def_prefix)]
-        data = load_data()
+        template = templates.load_template('ue_mannequin')
         rig_parents = {}
         for b in def_bones:
             name = mapping.get_name(b.name.strip(def_prefix))
@@ -116,13 +91,13 @@ class AddUnrealSkeletonOperator(bpy.types.Operator):
             bone.head = b.head
             bone.tail = b.tail
             bone.matrix = b.matrix.copy()
-            ue_roll_bone(bone, data['matrices'])
+            ue_roll_bone(bone, template['matrices'])
 
-        add_ik_bones(rig, data['iks'], data['matrices'])
+        add_ik_bones(rig, template['iks'], template['matrices'])
 
         aops.select_all(action = 'SELECT')
 
-        link_parents(rig, context.selected_editable_bones, data['parents'], rig_parents)
+        link_parents(rig, context.selected_editable_bones, template['parents'], rig_parents)
 
 
         bind.create_copy_bones(context, rig)
@@ -138,72 +113,6 @@ class AddUnrealSkeletonOperator(bpy.types.Operator):
 
         self.report({'INFO'}, 'Unreal skeleton sucessfully added')
 
-        return {'FINISHED'}
-
-    def invoke(self, context, event):
-        return self.execute(context)
-
-
-def serialize_matrix(mat):
-    result = []
-    for i in range(len(mat)):
-        result.append(list(mat[i][0:4]))
-    return result
-
-def load_data():
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    json_source = dir_path + '/templates/ue_mannequin.json'
-    with open(json_source) as json_file:
-        data = json.load(json_file)
-
-    for key, value in data['matrices'].items():
-        data['matrices'][key] = Matrix(data['matrices'][key])
-
-    for ik in data['iks']:
-        ik['head'] = Vector(ik['head'])
-        ik['tail'] = Vector(ik['tail'])
-    return data
-
-class SaveSkeletonDataOperator(bpy.types.Operator):
-    """Add unreal skeleton to rigify rig"""
-    bl_idname = "object.ocr_save_skeleton_data"
-    bl_label = "Save skeleton data"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    # example_prop: bpy.props.BoolProperty(name="Example prop", default=False)
-
-    @classmethod
-    def poll(cls, context):
-        return (context.space_data.type == 'VIEW_3D'
-            # and len(context.selected_objects) > 0
-            and context.view_layer.objects.active
-            and context.object.type == 'ARMATURE'
-            and (context.object.mode == 'OBJECT'))
-
-    def execute(self, context):
-        load_data()
-        return {'FINISHED'}
-        ue_skeleton = context.view_layer.objects.active
-        oops.mode_set(mode = 'EDIT')
-        matrices = get_matrices(ue_skeleton)
-        for key, value in matrices.items():
-            matrices[key] = serialize_matrix(value)
-        iks = get_iks(ue_skeleton)
-        for ik in iks:
-            ik['head'] = list(ik['head'][0:3])
-            ik['tail'] = list(ik['tail'][0:3])
-
-        parents = get_parents(ue_skeleton)
-        data = {
-            'matrices': matrices,
-            'iks': iks,
-            'parents': parents
-        }
-
-        dir_path = os.path.dirname(os.path.realpath(__file__))
-        with open(dir_path + '/templates/ue_mannequin.json', 'w') as outfile:
-            json.dump(data, outfile)
-        oops.mode_set(mode = 'OBJECT')
         return {'FINISHED'}
 
     def invoke(self, context, event):

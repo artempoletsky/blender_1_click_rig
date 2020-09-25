@@ -40,6 +40,8 @@ if "bpy" in locals():
     SaveSkeletonDataOperator = add_unreal_skeleton.SaveSkeletonDataOperator
     importlib.reload(panel)
     importlib.reload(mapping_editor)
+    importlib.reload(pose_character)
+    importlib.reload(templates)
 
 else:
     from . import preferences
@@ -57,6 +59,8 @@ else:
     from .add_unreal_skeleton import AddUnrealSkeletonOperator, SaveSkeletonDataOperator
     from . import panel
     from . import mapping_editor
+    from . import pose_character
+    from . import templates
 
 import bpy
 
@@ -75,7 +79,7 @@ classes = (
     RetargetAnimationOperator,
     ResetRigifyOperator,
     AddUnrealSkeletonOperator,
-    SaveSkeletonDataOperator,
+    templates.SaveSkeletonDataOperator,
     panel.OCR_PT_OcrPanel,
     mapping_editor.MappingEntry,
     mapping_editor.CreateMappingOperator,
@@ -88,6 +92,8 @@ classes = (
     mapping_editor.RenameArmatureOperator,
     mapping_editor.AddPrefixOperator,
     mapping_editor.RemovePrefixOperator,
+    pose_character.PoseCharacterOperator,
+
 )
 
 def vertex_menu_draw(self, context):
