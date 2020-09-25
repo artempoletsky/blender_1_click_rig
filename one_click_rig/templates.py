@@ -5,7 +5,7 @@ from mathutils import Matrix, Vector
 
 oops = bpy.ops.object
 
-templates_dir = dir_path = os.path.dirname(os.path.realpath(__file__)) + '/templates/'
+templates_dir = os.path.dirname(os.path.realpath(__file__)) + '/templates/'
 
 def get_template_file(name):
     return templates_dir + name + '.json'

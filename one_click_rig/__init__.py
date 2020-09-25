@@ -37,7 +37,6 @@ if "bpy" in locals():
     ResetRigifyOperator = reset_rigify.ResetRigifyOperator
     importlib.reload(add_unreal_skeleton)
     AddUnrealSkeletonOperator = add_unreal_skeleton.AddUnrealSkeletonOperator
-    SaveSkeletonDataOperator = add_unreal_skeleton.SaveSkeletonDataOperator
     importlib.reload(panel)
     importlib.reload(mapping_editor)
     importlib.reload(pose_character)
@@ -56,7 +55,7 @@ else:
     from .convert_to_rigify import ConvertToRigifyOperator
     from .retarget_animation import RetargetAnimationOperator
     from .reset_rigify import ResetRigifyOperator
-    from .add_unreal_skeleton import AddUnrealSkeletonOperator, SaveSkeletonDataOperator
+    from .add_unreal_skeleton import AddUnrealSkeletonOperator
     from . import panel
     from . import mapping_editor
     from . import pose_character
@@ -93,6 +92,7 @@ classes = (
     mapping_editor.AddPrefixOperator,
     mapping_editor.RemovePrefixOperator,
     pose_character.PoseCharacterOperator,
+    pose_character.SavePoseOperator,
 
 )
 

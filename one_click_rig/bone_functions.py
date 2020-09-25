@@ -68,3 +68,9 @@ ik_prop_bones = ['thigh_parent.L', 'thigh_parent.R', 'upper_arm_parent.L', 'uppe
 def set_ik_fk(rig, value):
     for n in ik_prop_bones:
         rig.pose.bones[n]['IK_FK'] = value
+
+def snap_ik_to_fk(rig):
+    return
+
+def snap_fk_to_ik(rig):
+    return
