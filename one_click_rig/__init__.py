@@ -21,8 +21,6 @@ if "bpy" in locals():
     MergeBonesOperator = merge_bones_with_vgroups.MergeBonesOperator
     importlib.reload(clear_empty_bones)
     ClearEmptyBonesOperator = clear_empty_bones.ClearEmptyBonesOperator
-    importlib.reload(rename_bones)
-    RenameBonesOperator = rename_bones.RenameBonesOperator
     importlib.reload(arrange_bones)
     ArrangeBonesOperator = arrange_bones.ArrangeBonesOperator
     importlib.reload(swap_bones_weights)
@@ -49,7 +47,6 @@ else:
     from .place_bone_to_vertex import PlaceBoneToVertexOperator
     from .merge_bones_with_vgroups import MergeBonesOperator
     from .clear_empty_bones import ClearEmptyBonesOperator
-    from .rename_bones import RenameBonesOperator
     from .arrange_bones import ArrangeBonesOperator
     from .swap_bones_weights import SwapBonesWeightsOperator
     from .generate_metarig import GenerateMetarigOperator
@@ -70,7 +67,6 @@ classes = (
     PlaceBoneToVertexOperator,
     MergeBonesOperator,
     ClearEmptyBonesOperator,
-    RenameBonesOperator,
     ArrangeBonesOperator,
     SwapBonesWeightsOperator,
     GenerateMetarigOperator,
@@ -82,13 +78,14 @@ classes = (
     SaveSkeletonDataOperator,
     panel.OCR_PT_OcrPanel,
     mapping_editor.MappingEntry,
-    mapping_editor.MappingEditorOperator,
+    mapping_editor.CreateMappingOperator,
     mapping_editor.OCR_PT_BoneMappingsPanel,
     mapping_editor.OCRMappingPanelProps,
     mapping_editor.MappingRemoveEntryOperator,
     mapping_editor.MappingAddEntryOperator,
     mapping_editor.SaveMappingOperator,
     mapping_editor.RemoveMappingOperator,
+    mapping_editor.RenameArmatureOperator,
 )
 
 def vertex_menu_draw(self, context):

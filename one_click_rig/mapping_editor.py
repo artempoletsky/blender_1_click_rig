@@ -80,32 +80,20 @@ def try_match_bone(name, names_to_search):
 
     return best_name
 
-class MappingEditorOperator(bpy.types.Operator):
+class CreateMappingOperator(bpy.types.Operator):
     """Select two armatures. And set relations between bones."""
-    bl_idname = "object.ocr_mapping_editor"
-    bl_label = "Mapping editor"
+    bl_idname = "object.ocr_create_mapping"
+    bl_label = "Create mapping"
     bl_options = {'REGISTER', 'UNDO'}
-
-    example_prop: bpy.props.BoolProperty(name="Example prop", default=False)
-
-    entries: bpy.props.CollectionProperty(type=MappingEntry)
-    # names2: bpy.props.PointerProperty(type=Array)
 
     @classmethod
     def poll(cls, context):
         return (context.space_data.type == 'VIEW_3D'
-            and len(context.selected_objects) > 0
+            and len(context.selected_objects) == 2
             and context.view_layer.objects.active
             and context.object.mode == 'OBJECT')
 
     def execute(self, context):
-        self.prefs = preferences.get_prefs()
-
-        self.report({'INFO'}, self.prefs.hello)
-        return {'FINISHED'}
-
-    def invoke(self, context, event):
-        print(bl_info)
         selected = list(context.selected_objects)
         active = context.view_layer.objects.active
         selected.remove(active)
@@ -116,42 +104,19 @@ class MappingEditorOperator(bpy.types.Operator):
 
         names1 = [bone.name for bone in bones1]
         names2 = [bone.name for bone in bones2]
+        ui = context.window_manager.one_click_rig_ui
+        ui.edit_mapping = True
+        ui.new_mapping_name = 'new_mapping_name'
+        mapping_entries = ui.mapping_entries
+        mapping_entries.clear()
+
         for name in names1:
-            entry = self.entries.add()
+            entry = mapping_entries.add()
             entry.bone_from = name
             entry.bone_to = try_match_bone(name, names2) or ''
-            # self.names1.append(bone.name)
 
 
-        # self.matches = [ for name in self.names1]
-        wm = context.window_manager
-        return wm.invoke_props_dialog(self, width = 800)
-
-    def draw(self, context):
-        layout = self.layout
-
-        # col.label(text="Custom Interface!")
-
-        main_rows = layout.row()
-
-        # print(get_bone_type(bones1[0].name))
-        # print(get_bone_type(bones2[0].name))
-        i = 0
-        for e in self.entries:
-            if i % 40 == 0:
-                col = main_rows.column()
-                main_rows.separator()
-
-            row = col.row()
-            subcol = row.column()
-            # subcol.label(text = name1)
-            subcol.prop(e, 'bone_from', text = '')
-            subcol = row.column()
-            subcol.prop(e, 'bone_to',  text = '')
-
-            i += 1
-
-# def load_active_mapping(ui)
+        return {'FINISHED'}
 
 
 class MappingRemoveEntryOperator(bpy.types.Operator):
@@ -183,7 +148,7 @@ class MappingAddEntryOperator(bpy.types.Operator):
 
 class SaveMappingOperator(bpy.types.Operator):
     """Save mapping"""
-    bl_idname = "object.ocr_mapping_save"
+    bl_idname = "object.ocr_save_mapping"
     bl_label = "Owerwrite mapping?"
     # bl_options = {'REGISTER', 'UNDO'}
 
@@ -206,7 +171,7 @@ class SaveMappingOperator(bpy.types.Operator):
 
 class RemoveMappingOperator(bpy.types.Operator):
     """Remove mapping"""
-    bl_idname = "object.ocr_mapping_remove"
+    bl_idname = "object.ocr_remove_mapping"
     bl_label = "Remove mapping?"
     # bl_options = {'REGISTER', 'UNDO'}
 
@@ -220,6 +185,25 @@ class RemoveMappingOperator(bpy.types.Operator):
 
     def invoke(self, context, event):
         return context.window_manager.invoke_confirm(self, event)
+
+
+class RenameArmatureOperator(bpy.types.Operator):
+    """Rename armature by mapping"""
+    bl_idname = "object.ocr_rename_armature"
+    bl_label = "Rename armature"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        return (context.space_data.type == 'VIEW_3D'
+            and context.view_layer.objects.active)
+
+    def execute(self, context):
+        ui = context.window_manager.one_click_rig_ui
+        mapping = map_bones.BoneMapping(ui.active_mapping, ui.rename_reverse)
+        mapping.rename_armature(context.object.data)
+        return {'FINISHED'}
+
 
 
 
@@ -262,13 +246,17 @@ class OCRMappingPanelProps(bpy.types.PropertyGroup):
 
     new_mapping_name: bpy.props.StringProperty()
     mapping_entries:bpy.props.CollectionProperty(type=MappingEntry)
+    rename_reverse: bpy.props.BoolProperty(
+        name = "Reverse",
+        default = False
+        )
 
 
 class OCR_PT_BoneMappingsPanel(bpy.types.Panel):
     """
     Addon panel
     """
-    bl_label = 'Bone mappings'
+    bl_label = '1 click rig. Bone mappings'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'Rigify'
@@ -299,7 +287,7 @@ class OCR_PT_BoneMappingsPanel(bpy.types.Panel):
         col.label(text = 'New mapping name')
         col.prop(ui, 'new_mapping_name', text = '')
         col.separator()
-        col.operator('object.ocr_mapping_save', text = 'Save mapping')
+        col.operator('object.ocr_save_mapping', text = 'Save mapping')
         return
 
     def draw(self, context):
@@ -310,7 +298,14 @@ class OCR_PT_BoneMappingsPanel(bpy.types.Panel):
 
         col.prop(ui, 'active_mapping')
         col.prop(ui, "edit_mapping", toggle=True)
-        col.operator("object.ocr_mapping_remove", text = 'Remove mapping')
+        col.operator("object.ocr_remove_mapping", text = 'Remove mapping')
+        col.operator("object.ocr_create_mapping")
 
         if ui.edit_mapping:
             self.draw_mapping(col, ui)
+        else:
+            col.separator()
+            row = col.row()
+            row.operator("object.ocr_rename_armature")
+            row.prop(ui, 'rename_reverse')
+            # props.name = ui.active_mapping
