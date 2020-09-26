@@ -278,17 +278,20 @@ def create_finger(name, suffix, source_object, object):
     params = save_rigify_type(name + '.01.' + suffix, 'limbs.super_finger', 6, 6)
     params['primary_rotation_axis'] = 'X'
 
-
+scene_scale = {
+    'scale': 1
+}
 def create_leg(suffix, source_object, object, layer = 0):
     source_armature = source_object.data
     spine = ['thigh.' + suffix, 'shin.' + suffix, 'foot.' + suffix, 'toe.' + suffix]
     bones = create_bone_chain(spine, source_armature, object, layer = layer)
 
-    heel_width = 0.05
+    heel_width = 0.05 / scene_scale['scale']
+    # print(scene_scale)
     heel_x = bones[1].tail.x
     heel_y = bones[1].tail.y
-    heel_x = heel_x - heel_width if suffix == 'l' else heel_x + heel_width
-    heel_width = heel_width * 2 if suffix == 'l' else -2 * heel_width
+    heel_x = heel_x - heel_width if suffix == 'L' else heel_x + heel_width
+    heel_width = heel_width * 2 if suffix == 'L' else -2 * heel_width
 
     heel = object.data.edit_bones.new('heel.'+suffix.upper())
     heel.use_connect = False
@@ -299,11 +302,12 @@ def create_leg(suffix, source_object, object, layer = 0):
     b_fun.align_bone_x_axis(bones[0], Vector((1, 0, 0)))
     b_fun.align_bone_x_axis(bones[1], Vector((1, 0, 0)))
 
-    foot_end = get_foot_end(source_object.children[0], 'toe.' + suffix)
-    if foot_end == float('inf'):
-        foot_end = bones[-1].head.y - 0.1
-    bones[-1].tail.y = foot_end
-    bones[-1].tail.z = bones[-1].head.z
+    if len(source_object.children):
+        foot_end = get_foot_end(source_object.children[0], 'toe.' + suffix)
+        if foot_end == float('inf'):
+            foot_end = bones[-1].head.y - 0.1
+        bones[-1].tail.y = foot_end
+        bones[-1].tail.z = bones[-1].head.z
     # print(foot_end)
     params = save_rigify_type('thigh.' + suffix, 'limbs.super_limb', layer + 1, layer + 2)
     params['limb_type'] = 'leg'
@@ -348,6 +352,9 @@ class GenerateMetarigOperator(bpy.types.Operator):
         location = context.object.location
         source_object = context.object
         source_armature = context.object.data
+
+        scene_scale['scale'] = context.scene.unit_settings.scale_length
+        # print(scene_scale)
 
 
         # save_axises(source_armature)
