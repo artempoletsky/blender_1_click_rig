@@ -14,29 +14,17 @@ if "bpy" in locals():
     import importlib
     importlib.reload(preferences)
     importlib.reload(weight_paint_toggle)
-    WeightPaintToggleOperator = weight_paint_toggle.WeightPaintToggleOperator
     importlib.reload(place_bone_to_vertex)
-    PlaceBoneToVertexOperator = place_bone_to_vertex.PlaceBoneToVertexOperator
     importlib.reload(merge_bones_with_vgroups)
-    MergeBonesOperator = merge_bones_with_vgroups.MergeBonesOperator
     importlib.reload(clear_empty_bones)
-    ClearEmptyBonesOperator = clear_empty_bones.ClearEmptyBonesOperator
     importlib.reload(arrange_bones)
-    ArrangeBonesOperator = arrange_bones.ArrangeBonesOperator
     importlib.reload(swap_bones_weights)
-    SwapBonesWeightsOperator = swap_bones_weights.SwapBonesWeightsOperator
     importlib.reload(generate_metarig)
-    GenerateMetarigOperator = generate_metarig.GenerateMetarigOperator
     importlib.reload(bind_rig_to_armature)
-    BindRigifyToArmatureOperator = bind_rig_to_armature.BindRigifyToArmatureOperator
     importlib.reload(convert_to_rigify)
-    ConvertToRigifyOperator = convert_to_rigify.ConvertToRigifyOperator
     importlib.reload(retarget_animation)
-    RetargetAnimationOperator = retarget_animation.RetargetAnimationOperator
     importlib.reload(reset_rigify)
-    ResetRigifyOperator = reset_rigify.ResetRigifyOperator
     importlib.reload(add_unreal_skeleton)
-    AddUnrealSkeletonOperator = add_unreal_skeleton.AddUnrealSkeletonOperator
     importlib.reload(panel)
     importlib.reload(mapping_editor)
     importlib.reload(pose_character)
@@ -44,18 +32,18 @@ if "bpy" in locals():
 
 else:
     from . import preferences
-    from .weight_paint_toggle import WeightPaintToggleOperator
-    from .place_bone_to_vertex import PlaceBoneToVertexOperator
-    from .merge_bones_with_vgroups import MergeBonesOperator
-    from .clear_empty_bones import ClearEmptyBonesOperator
-    from .arrange_bones import ArrangeBonesOperator
-    from .swap_bones_weights import SwapBonesWeightsOperator
-    from .generate_metarig import GenerateMetarigOperator
-    from .bind_rig_to_armature import BindRigifyToArmatureOperator
-    from .convert_to_rigify import ConvertToRigifyOperator
-    from .retarget_animation import RetargetAnimationOperator
-    from .reset_rigify import ResetRigifyOperator
-    from .add_unreal_skeleton import AddUnrealSkeletonOperator
+    from . import weight_paint_toggle
+    from . import place_bone_to_vertex
+    from . import merge_bones_with_vgroups
+    from . import clear_empty_bones
+    from . import arrange_bones
+    from . import swap_bones_weights
+    from . import generate_metarig
+    from . import bind_rig_to_armature
+    from . import convert_to_rigify
+    from . import retarget_animation
+    from . import reset_rigify
+    from . import add_unreal_skeleton
     from . import panel
     from . import mapping_editor
     from . import pose_character
@@ -66,18 +54,19 @@ import bpy
 classes = (
     # preferences.RigToolsPreferences,
     # preferences.BoilerplatePreferencesAddKeymapOperator,
-    WeightPaintToggleOperator,
-    PlaceBoneToVertexOperator,
-    MergeBonesOperator,
-    ClearEmptyBonesOperator,
-    ArrangeBonesOperator,
-    SwapBonesWeightsOperator,
-    GenerateMetarigOperator,
-    BindRigifyToArmatureOperator,
-    ConvertToRigifyOperator,
-    RetargetAnimationOperator,
-    ResetRigifyOperator,
-    AddUnrealSkeletonOperator,
+    weight_paint_toggle.WeightPaintToggleOperator,
+    place_bone_to_vertex.PlaceBoneToVertexOperator,
+    merge_bones_with_vgroups.MergeBonesOperator,
+    clear_empty_bones.ClearEmptyBonesOperator,
+    arrange_bones.ArrangeBonesOperator,
+    swap_bones_weights.SwapBonesWeightsOperator,
+    generate_metarig.GenerateMetarigOperator,
+    bind_rig_to_armature.BindRigifyToArmatureOperator,
+    convert_to_rigify.ConvertToRigifyOperator,
+    convert_to_rigify.ConvertToRigifyByMappingOperator,
+    retarget_animation.RetargetAnimationOperator,
+    reset_rigify.ResetRigifyOperator,
+    add_unreal_skeleton.AddUnrealSkeletonOperator,
     templates.SaveSkeletonDataOperator,
     panel.OCR_PT_OcrPanel,
     mapping_editor.MappingEntry,

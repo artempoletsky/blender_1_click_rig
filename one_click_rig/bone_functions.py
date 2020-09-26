@@ -74,3 +74,13 @@ def snap_ik_to_fk(rig):
 
 def snap_fk_to_ik(rig):
     return
+
+def set_ik_stretch(rig, value):
+    for b in ik_prop_bones:
+        rig.pose.bones[b]['IK_Stretch'] = value
+    return
+
+def prepare_rig(rig):
+    rig.show_in_front = True
+    set_ik_stretch(rig, 0.0)
+    show_layers(rig, True)
