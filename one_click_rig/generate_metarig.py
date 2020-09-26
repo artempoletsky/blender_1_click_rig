@@ -2,7 +2,7 @@ import bpy
 import os
 from . import preferences
 from .map_bones import BoneMapping
-from mathutils import Vector, Matrix
+from mathutils import Vector, Matrix, geometry
 import math
 from . import bone_functions as b_fun
 
@@ -259,21 +259,21 @@ def get_finger_axis(armature, finger, suffix):
     return axis
 
 
-def create_finger(name, suffix, source_object, object):
+def create_finger(name, suffix, source_object, object, palm_coord, palm_normal):
     source_armature = source_object.data
     spine = [name + '.01.' + suffix, name + '.02.' + suffix, name + '.03.' + suffix]
     bones = create_bone_chain(spine, source_armature, object, layer = 5)
-    # copy_rotation_from_parent(bones[-1])
-    # vec = get_finger_end_point(source_object.children[0], name + '_03_' +, bones[-1].head)
-    # print(vec)
-    # bones[-1].tail = vec
-    # align_bone_to_point(bones[-1], vec)
-    # axis = get_finger_axis(source_object.data, bones[0], suffix)
-    # b_fun.align_bone_x_axis(bones[0], saved_z_axises[bones[0].name])
-    # b_fun.align_bone_x_axis(bones[1], saved_z_axises[bones[1].name])
-    # b_fun.align_bone_x_axis(bones[2], saved_z_axises[bones[2].name])
+
     for bone in bones:
-        b_fun.align_bone_x_axis(bone, Vector((0, 1, 0)))
+        if name == 'thumb':
+            vec = palm_coord - bone.tail
+        else:
+            vec = -palm_normal.cross(bone.vector)
+
+        if suffix == 'R':
+            vec = - vec
+
+        b_fun.align_bone_x_axis(bone, vec)
 
     params = save_rigify_type(name + '.01.' + suffix, 'limbs.super_finger', 6, 6)
     params['primary_rotation_axis'] = 'X'
@@ -313,7 +313,7 @@ def create_leg(suffix, source_object, object, layer = 0):
     params['limb_type'] = 'leg'
     params['rotation_axis'] = 'x'
 
-def create_arm(suffix, source_armature, object, layer = 0):
+def create_arm(suffix, source_armature, object, palm_no, layer = 0):
     spine = ['upper_arm.' + suffix, 'forearm.' + suffix, 'hand.' + suffix]
     bones = create_bone_chain(spine, source_armature, object, layer = layer)
 
@@ -325,9 +325,26 @@ def create_arm(suffix, source_armature, object, layer = 0):
     else:
         align_bone_to_vector(bones[-1], bones[-2].vector)
     for bone in bones:
-        b_fun.align_bone_x_axis(bone, Vector((0, 0, -1)))
+        vec = Vector((0, 0, -1)) if suffix == 'L' else Vector((0, 0, 1))
+        if bone.name.startswith('hand') and palm_no:
+            vec = palm_no
+        b_fun.align_bone_x_axis(bone, vec)
     params = save_rigify_type('upper_arm.' + suffix, 'limbs.super_limb', layer + 1, layer + 2)
     params['rotation_axis'] = 'x'
+
+def compute_palm(source_armature, suffix):
+    h = get_bone_position(source_armature, 'hand.' + suffix)
+    r = get_bone_position(source_armature, 'f_ring.01.' + suffix)
+    i = get_bone_position(source_armature, 'f_index.01.' + suffix)
+    m = get_bone_position(source_armature, 'f_middle.01.' + suffix)
+    if not h:
+        return None, None
+    if not r or not i or not m:
+        hand = get_bone(source_armature, 'hand.' + suffix )
+        return (hand.head + hand.tail) / 2, hand.x_axis
+    palm_co = (h + m) / 2
+    palm_no = -geometry.normal((h, i, r))
+    return palm_co, palm_no
 
 
 class GenerateMetarigOperator(bpy.types.Operator):
@@ -391,20 +408,23 @@ class GenerateMetarigOperator(bpy.types.Operator):
         if bone:
             b_fun.align_bone_x_axis(bone, Vector((-1, 0, 0)))
 
-        create_arm('L', source_armature, context.object, layer = 7)
-        create_arm('R', source_armature, context.object, layer = 10)
+        co, no = compute_palm(source_armature, 'L')
+        create_arm('L', source_armature, context.object, no, layer = 7)
 
-        create_finger('thumb', 'L', source_object, context.object)
-        create_finger('f_index', 'L', source_object, context.object)
-        create_finger('f_middle', 'L', source_object, context.object)
-        create_finger('f_ring', 'L', source_object, context.object)
-        create_finger('f_pinky', 'L', source_object, context.object)
+        create_finger('thumb', 'L', source_object, context.object, co, no)
+        create_finger('f_index', 'L', source_object, context.object, co, no)
+        create_finger('f_middle', 'L', source_object, context.object, co, no)
+        create_finger('f_ring', 'L', source_object, context.object, co, no)
+        create_finger('f_pinky', 'L', source_object, context.object, co, no)
 
-        create_finger('thumb', 'R', source_object, context.object)
-        create_finger('f_index', 'R', source_object, context.object)
-        create_finger('f_middle', 'R', source_object, context.object)
-        create_finger('f_ring', 'R', source_object, context.object)
-        create_finger('f_pinky', 'R', source_object, context.object)
+        co, no = compute_palm(source_armature, 'R')
+        create_arm('R', source_armature, context.object, no, layer = 10)
+
+        create_finger('thumb', 'R', source_object, context.object, co, no)
+        create_finger('f_index', 'R', source_object, context.object, co, no)
+        create_finger('f_middle', 'R', source_object, context.object, co, no)
+        create_finger('f_ring', 'R', source_object, context.object, co, no)
+        create_finger('f_pinky', 'R', source_object, context.object, co, no)
 
         create_leg('L', source_object, context.object, layer = 13)
         create_leg('R', source_object, context.object, layer = 16)
