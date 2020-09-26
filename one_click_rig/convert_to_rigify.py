@@ -1,5 +1,6 @@
 import bpy
 from . import preferences
+from .map_bones import BoneMapping
 
 oops = bpy.ops.object
 pops = bpy.ops.pose
@@ -32,11 +33,18 @@ class ConvertToRigifyOperator(bpy.types.Operator):
         if parent:
             parent.select_set(False)
         mesh_object.select_set(False)
+
+        mapping = BoneMapping('uemannequin_rigify', False)
+        mapping_reverse = BoneMapping('uemannequin_rigify', True)
+        mapping.rename_armature(armature_object.data)
+        oops.mode_set(mode = 'OBJECT')
         oops.ocr_generate_metarig()
         metarig = context.object
         oops.mode_set(mode = 'OBJECT')
         pops.rigify_generate()
         armature_object.select_set(True)
+        mapping_reverse.rename_armature(armature_object.data)
+        oops.mode_set(mode = 'OBJECT')
         oops.ocr_bind_rigify_to_armature()
 
         objs = bpy.data.objects

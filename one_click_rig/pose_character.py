@@ -128,10 +128,7 @@ class SavePoseOperator(bpy.types.Operator):
 
     def execute(self, context):
         rig = context.view_layer.objects.active
-        # mapping = map_bones.load_mapping('rigify_uemannequin', anim = True)
-
-        # fk_bones = [fr for fr, to, type in mapping]
-
+        
         oops.mode_set(mode = 'POSE')
         pose_bones = rig.pose.bones
         fks = {}

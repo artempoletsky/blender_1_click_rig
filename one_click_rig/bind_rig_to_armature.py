@@ -166,7 +166,7 @@ def disable_stretch(context, rig):
 
 def create_copy_bones(context, rig):
 
-    mapping = BoneMapping('rigify_uemannequin', True)
+    mapping = BoneMapping('uemannequin_rigify', False)
 
     oops.mode_set(mode = 'EDIT')
     aops.select_all(action = 'SELECT')
@@ -237,6 +237,7 @@ class BindRigifyToArmatureOperator(bpy.types.Operator):
         rig, armature = b_fun.get_rig_and_armature(context)
 
         rig.name = 'Armature'
+        rig.show_in_front = True
 
         copy_armature(context, rig, armature)
         create_copy_bones(context, rig)

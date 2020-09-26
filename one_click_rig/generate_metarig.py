@@ -258,21 +258,35 @@ def get_finger_axis(armature, finger, suffix):
 
     return axis
 
+def create_thumb(suffix, source_object, object, palm_coord, palm_normal):
+    source_armature = source_object.data
+    spine = ['thumb.01.' + suffix, 'thumb.02.' + suffix, 'thumb.03.' + suffix]
+    bones = create_bone_chain(spine, source_armature, object, layer = 5)
+
+    if suffix == 'R':
+        palm_normal = - palm_normal
+    point = palm_coord + palm_normal / 8
+
+    for bone in bones:
+        z_axis = point - bone.tail
+        vec = -z_axis.cross(bone.vector)
+        b_fun.align_bone_x_axis(bone, vec)
+
+    params = save_rigify_type('thumb.01.' + suffix, 'limbs.super_finger', 6, 6)
+    params['primary_rotation_axis'] = 'X'
+
 
 def create_finger(name, suffix, source_object, object, palm_coord, palm_normal):
     source_armature = source_object.data
     spine = [name + '.01.' + suffix, name + '.02.' + suffix, name + '.03.' + suffix]
     bones = create_bone_chain(spine, source_armature, object, layer = 5)
 
+    if suffix == 'R':
+        palm_normal = - palm_normal
+    point = palm_coord + palm_normal
     for bone in bones:
-        if name == 'thumb':
-            vec = palm_coord - bone.tail
-        else:
-            vec = -palm_normal.cross(bone.vector)
-
-        if suffix == 'R':
-            vec = - vec
-
+        z_axis = point - bone.tail
+        vec = -z_axis.cross(bone.vector)
         b_fun.align_bone_x_axis(bone, vec)
 
     params = save_rigify_type(name + '.01.' + suffix, 'limbs.super_finger', 6, 6)
@@ -344,6 +358,7 @@ def compute_palm(source_armature, suffix):
         return (hand.head + hand.tail) / 2, hand.x_axis
     palm_co = (h + m) / 2
     palm_no = -geometry.normal((h, i, r))
+    palm_no *= (h - m).length * 1
     return palm_co, palm_no
 
 
@@ -364,8 +379,6 @@ class GenerateMetarigOperator(bpy.types.Operator):
             and (context.object.mode == 'OBJECT'))
 
     def execute(self, context):
-        # mapping = BoneMapping('rigify_uemannequin', True)
-        # mapping = None
         location = context.object.location
         source_object = context.object
         source_armature = context.object.data
@@ -393,12 +406,13 @@ class GenerateMetarigOperator(bpy.types.Operator):
 
 
         bone, params = add_single_bone('shoulder.L', source_armature, context.object, direction_bone_name = 'upper_arm.L', layer = 3)
+        global_z_axis = Vector((0, 0, 1))
         if bone:
-            b_fun.align_bone_x_axis(bone, Vector((0, 1, 0)))
+            b_fun.align_bone_x_axis(bone, -global_z_axis.cross(bone.vector))
             params['make_widget'] = False
         bone, params = add_single_bone('shoulder.R', source_armature, context.object, direction_bone_name = 'upper_arm.R', layer = 3)
         if bone:
-            b_fun.align_bone_x_axis(bone, Vector((0, 1, 0)))
+            b_fun.align_bone_x_axis(bone, -global_z_axis.cross(bone.vector))
             params['make_widget'] = False
 
         bone, params = add_single_bone('breast.L', source_armature, context.object, layer = 3)
@@ -411,7 +425,7 @@ class GenerateMetarigOperator(bpy.types.Operator):
         co, no = compute_palm(source_armature, 'L')
         create_arm('L', source_armature, context.object, no, layer = 7)
 
-        create_finger('thumb', 'L', source_object, context.object, co, no)
+        create_thumb('L', source_object, context.object, co, no)
         create_finger('f_index', 'L', source_object, context.object, co, no)
         create_finger('f_middle', 'L', source_object, context.object, co, no)
         create_finger('f_ring', 'L', source_object, context.object, co, no)
@@ -420,7 +434,7 @@ class GenerateMetarigOperator(bpy.types.Operator):
         co, no = compute_palm(source_armature, 'R')
         create_arm('R', source_armature, context.object, no, layer = 10)
 
-        create_finger('thumb', 'R', source_object, context.object, co, no)
+        create_thumb('R', source_object, context.object, co, no)
         create_finger('f_index', 'R', source_object, context.object, co, no)
         create_finger('f_middle', 'R', source_object, context.object, co, no)
         create_finger('f_ring', 'R', source_object, context.object, co, no)
