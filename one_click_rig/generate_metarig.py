@@ -179,7 +179,7 @@ def add_single_bone(name, source_armature, object, direction_bone_name = None, l
         align_bone_to_point(bone, get_bone_position(source_armature, direction_bone_name))
     else:
         if not direction_vector:
-            direction_vector = Vector((0, 1, 0))
+            direction_vector = Vector((0, -1, 0))
         align_bone_to_vector(bone, direction_vector)
 
     if parent_name:

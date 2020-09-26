@@ -12,6 +12,7 @@ class MappingEntry(bpy.types.PropertyGroup):
     bone_to: bpy.props.StringProperty()
 
 mappings = {
+    'palm': r'(?i)(carpal|palm)',
     'head': r'(?i)(head)',
     'neck': r'(?i)(neck)',
     'pelvis': r'(?i)(pelvis|hip)',
@@ -54,7 +55,13 @@ def get_bone_side(name):
     res = re.findall('(?i)([\._-]l|left)', name)
     if res:
         return 'l'
+    res = re.findall('(^l[A-Z])', name)
+    if res:
+        return 'l'
     res = re.findall('(?i)([\._-]r|right)', name)
+    if res:
+        return 'r'
+    res = re.findall('(^r[A-Z])', name)
     if res:
         return 'r'
     return None
