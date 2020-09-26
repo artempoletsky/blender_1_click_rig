@@ -72,16 +72,29 @@ def get_bone_position(armature, bone_name, mapping = None, head = True):
         return None
     return Vector(bone.head_local if head else bone.tail_local)
 
+saved_rigify_types = {}
+def save_rigify_type(bone_name, type, fk_layer, tweak_layer):
+    result = {}
+    saved_rigify_types[bone_name] = result
+    result['rigify_type'] = type
+    result['fk_layer'] = fk_layer
+    result['tweak_layer'] = tweak_layer
+    return result
 
-def set_rigify_type(object, bone_name, type, fk_layer, tweak_layer):
-    oops.posemode_toggle();
-    bone = object.pose.bones[bone_name]
-    bone.rigify_type = type
+def set_rigify_types(object):
+    pose_bones = object.pose.bones
+    for bone_name, rigify_type in saved_rigify_types.items():
+        bone = pose_bones[bone_name]
+        for key, value in rigify_type.items():
+            if key == 'rigify_type':
+                bone.rigify_type = value
+            elif key == 'tweak_layer':
+                b_fun.set_array_indices(bone.rigify_parameters.tweak_layers, [value])
+            elif key == 'fk_layer':
+                b_fun.set_array_indices(bone.rigify_parameters.fk_layers, [value])
+            else:
+                setattr(bone.rigify_parameters, key, value)
 
-    b_fun.set_array_indices(bone.rigify_parameters.tweak_layers, [tweak_layer])
-    b_fun.set_array_indices(bone.rigify_parameters.fk_layers, [fk_layer])
-    oops.editmode_toggle();
-    return bone.rigify_parameters
 
 def create_bone_chain(spine_arr, source_armature, object, layer = 0, parent_name = None):
     # print(spine_arr)
@@ -145,7 +158,7 @@ def align_bone_to_point(edit_bone, point):
 
 def add_single_bone(name, parent_name, source_armature, object, direction_bone_name = None, layer = 0, fk_layer_offset = 1, tweak_layer_offset = 1, direction_vector = None):
     target_armature = object.data
-    switch_to_layer(target_armature, layer)
+    b_fun.switch_to_layer(target_armature, layer)
     source_bone = get_bone(source_armature, name)
     if not source_bone:
         print(name + ' passed')
@@ -169,7 +182,7 @@ def add_single_bone(name, parent_name, source_armature, object, direction_bone_n
 
     # b_fun.align_bone_x_axis(bone, saved_y_axises[name])
 
-    rigify_parameters = set_rigify_type(object, bone.name, 'basic.super_copy', layer + fk_layer_offset, layer + tweak_layer_offset)
+    rigify_parameters = save_rigify_type(bone.name, 'basic.super_copy', layer + fk_layer_offset, layer + tweak_layer_offset)
 
     return bone, rigify_parameters
 
@@ -194,9 +207,9 @@ def create_spine(source_armature, object, head_chain_length):
     for bone in bones:
         b_fun.align_bone_x_axis(bone, Vector((1, 0, 0)))
 
-    set_rigify_type(object, bones[0].name, 'spines.basic_spine', 4, 4)
+    save_rigify_type(bones[0].name, 'spines.basic_spine', 4, 4)
     bones[-head_chain_length].use_connect = False
-    set_rigify_type(object, bones[-head_chain_length].name, 'spines.super_head', 4, 4)
+    save_rigify_type(bones[-head_chain_length].name, 'spines.super_head', 4, 4)
 
 
 def get_finger_end_point(object, vgroup_name, bone_head):
@@ -256,8 +269,8 @@ def create_finger(name, suffix, source_object, object):
     for bone in bones:
         b_fun.align_bone_x_axis(bone, Vector((0, 1, 0)))
 
-    params = set_rigify_type(object, name + '.01.' + suffix, 'limbs.super_finger', 6, 6)
-    params.primary_rotation_axis = 'X'
+    params = save_rigify_type(name + '.01.' + suffix, 'limbs.super_finger', 6, 6)
+    params['primary_rotation_axis'] = 'X'
 
 
 def create_leg(suffix, source_object, object, layer = 0):
@@ -286,9 +299,9 @@ def create_leg(suffix, source_object, object, layer = 0):
     bones[-1].tail.y = foot_end
     bones[-1].tail.z = bones[-1].head.z
     # print(foot_end)
-    params = set_rigify_type(object, 'thigh.' + suffix, 'limbs.super_limb', layer + 1, layer + 2)
-    params.limb_type = 'leg'
-    params.rotation_axis = 'x'
+    params = save_rigify_type('thigh.' + suffix, 'limbs.super_limb', layer + 1, layer + 2)
+    params['limb_type'] = 'leg'
+    params['rotation_axis'] = 'x'
 
 def create_arm(suffix, source_armature, object, layer = 0):
     spine = ['upper_arm.' + suffix, 'forearm.' + suffix, 'hand.' + suffix]
@@ -303,8 +316,8 @@ def create_arm(suffix, source_armature, object, layer = 0):
         align_bone_to_vector(bones[-1], bones[-2].vector)
     for bone in bones:
         b_fun.align_bone_x_axis(bone, Vector((0, 0, -1)))
-    params = set_rigify_type(object, 'upper_arm.' + suffix, 'limbs.super_limb', layer + 1, layer + 2)
-    params.rotation_axis = 'x'
+    params = save_rigify_type('upper_arm.' + suffix, 'limbs.super_limb', layer + 1, layer + 2)
+    params['rotation_axis'] = 'x'
 
 
 class GenerateMetarigOperator(bpy.types.Operator):
@@ -352,11 +365,11 @@ class GenerateMetarigOperator(bpy.types.Operator):
         bone, params = add_single_bone('shoulder.L', 'spine.003', source_armature, context.object, direction_bone_name = 'upper_arm.L', layer = 3)
         if bone:
             b_fun.align_bone_x_axis(bone, Vector((0, 1, 0)))
-            params.make_widget = False
+            params['make_widget'] = False
         bone, params = add_single_bone('shoulder.R', 'spine.003', source_armature, context.object, direction_bone_name = 'upper_arm.R', layer = 3)
         if bone:
             b_fun.align_bone_x_axis(bone, Vector((0, 1, 0)))
-            params.make_widget = False
+            params['make_widget'] = False
 
         bone, params = add_single_bone('breast.L', 'spine.003', source_armature, context.object, layer = 3)
         if bone:
@@ -391,6 +404,8 @@ class GenerateMetarigOperator(bpy.types.Operator):
         #         add_single_bone(bone.name, parent_name, source_armature, context.object, layer = 3)
 
         b_fun.set_array_indices(context.object.data.layers, [0, 3, 5, 7, 10, 13, 16])
+        oops.mode_set(mode = 'POSE')
+        set_rigify_types(context.object)
         oops.mode_set(mode = 'OBJECT')
         # mapping.rename_armature(context.object.data)
         return {'FINISHED'}
