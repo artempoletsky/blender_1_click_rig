@@ -1,4 +1,9 @@
 import math
+import bpy
+import re
+
+oops = bpy.ops.object
+pops = bpy.ops.pose
 
 def set_array_indices(array, indices):
     for i in range(len(array)):
@@ -65,12 +70,47 @@ def get_rig_and_armature(context):
 
 
 ik_prop_bones = ['thigh_parent.L', 'thigh_parent.R', 'upper_arm_parent.L', 'upper_arm_parent.R']
+poles = ['thigh_ik_target.L', 'thigh_ik_target.R', 'upper_arm_ik_target.R', 'upper_arm_ik_target.R']
+ik_bones = ['thigh_ik.L', 'thigh_ik.R', 'upper_arm_ik.R', 'upper_arm_ik.R']
+ik_controls = ['hand_ik.L','hand_ik.R','foot_ik.L','foot_ik.R']
+
 def set_ik_fk(rig, value):
     for n in ik_prop_bones:
         rig.pose.bones[n]['IK_FK'] = value
 
-def snap_ik_to_fk(rig):
+def fix_poles(context, rig):
+    oops.mode_set(mode = 'EDIT')
+    eb = rig.data.edit_bones
+    for i, b in enumerate(poles):
+        pole = eb[b]
+        ik = eb[ik_bones[i]]
+        vec = -ik.z_axis
+        vec.normalize()
+        d = (ik.tail - pole.head).length
+        len = pole.length
+        pole.head = ik.tail + d * vec
+        pole.tail = pole.head - len * vec
+    oops.mode_set(mode = 'POSE')
+
     return
+
+def select_bones(rig, names):
+    pops.select_all(action = 'DESELECT')
+    rig.data.bones.active = rig.data.bones[names[0]]
+    for n in names:
+        rig.data.bones[n].select = True
+        rig.data.bones[n].select_head = True
+        rig.data.bones[n].select_tail = True
+
+def snap_ik_to_fk(rig):
+    oops.mode_set(mode = 'POSE')
+    for n in ik_controls:
+        fk_bone_name =  n.replace('ik', 'fk')
+        rig.pose.bones[n].matrix = rig.pose.bones[fk_bone_name].matrix.copy()
+
+    select_bones(rig, ['foot_ik.L','foot_ik.R'])
+    pops.rot_clear()
+    pops.scale_clear()
 
 def snap_fk_to_ik(rig):
     return

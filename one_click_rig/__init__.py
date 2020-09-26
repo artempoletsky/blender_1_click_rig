@@ -1,7 +1,7 @@
 bl_info = {
     "name": "1 click rig",
     "author": "Artem Poletsky",
-    "version": (1, 3, 1),
+    "version": (1, 4, 0),
     "blender": (2, 82, 0),
     "location": "",
     "description": "A collection of rig operators",
