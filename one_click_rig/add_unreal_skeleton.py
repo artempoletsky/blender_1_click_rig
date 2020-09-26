@@ -52,7 +52,7 @@ class AddUnrealSkeletonOperator(bpy.types.Operator):
             and (context.object.mode == 'OBJECT'))
 
     def execute(self, context):
-        mapping = BoneMapping('rigify_uemannequin', False)
+        mapping = BoneMapping('uemannequin_rigify', True)
 
         rig = context.view_layer.objects.active
         rig.name = 'Armature'

@@ -21,8 +21,15 @@ class OCR_PT_OcrPanel(bpy.types.Panel):
         row.operator("pose.rigify_generate", text="Generate Rig", icon='POSE_HLT')
         row = col.row()
         row.operator("object.ocr_bind_rigify_to_armature")
+        ui = context.window_manager.one_click_rig_ui
+        col.separator()
+        row = col.row()
+        row.prop(ui, 'active_mapping', text = '')
+        row.operator('object.ocr_convert_to_rigify_by_mapping', text = 'Convert char by mapping')
+
         #
         #
+        col.separator()
         col.label(text="Converting from Rigify operators:")
 
         row = col.row()

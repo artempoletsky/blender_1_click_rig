@@ -9,6 +9,7 @@ import re
 import os
 
 oops = bpy.ops.object
+pops = bpy.ops.pose
 pose_dir = os.path.dirname(os.path.realpath(__file__)) + '/poses/'
 
 def get_pose_file(name):
@@ -91,23 +92,37 @@ class PoseCharacterOperator(bpy.types.Operator):
             # print(t)
 
             bone.matrix = t @ s @ r
-            oops.posemode_toggle()
-            oops.posemode_toggle()
+            context.view_layer.update()
         torso_bone = pose_bones['torso']
         head = torso_bone.head.copy()
         head.y = torso.y
         t = Matrix.Translation(head - torso_bone.head)
         torso_bone.matrix = torso_bone.matrix @ t
 
-#         pose_ops = bpy.ops.pose
-#
-#         pose_ops['rigify_limb_ik2fk_' + rig_id]()
-# props = group1.operator('pose.rigify_limb_ik2fk_tm2w8d4817ffd6f5', text='IK->FK (hand.L)', icon='SNAP_ON')
-# props.prop_bone = 'upper_arm_parent.L'
-# props.fk_bones = '["upper_arm_fk.L", "forearm_fk.L", "hand_fk.L"]'
-# props.ik_bones = '["upper_arm_ik.L", "MCH-forearm_ik.L", "MCH-upper_arm_ik_target.L"]'
-# props.ctrl_bones = '["upper_arm_ik.L", "hand_ik.L", "upper_arm_ik_target.L"]'
-# props.extra_ctrls = '[]'
+        b_fun.snap_ik_to_fk(rig)
+        oops.mode_set(mode = 'OBJECT')
+        oops.select_all(action = 'DESELECT')
+        for c in rig.children:
+            context.view_layer.objects.active = c
+            c.select_set(True)
+            oops.modifier_copy(modifier = 'Armature')
+            oops.modifier_apply(modifier = 'Armature.001')
+            c.select_set(False)
+
+        context.view_layer.objects.active = rig
+        rig.select_set(True)
+
+        oops.mode_set(mode = 'POSE')
+        for i in range(32):
+            rig.data.layers[i] = i != 30
+
+        pops.select_all(action = 'SELECT')
+        pops.armature_apply(selected = True)
+        pops.select_all(action = 'DESELECT')
+
+
+        b_fun.prepare_rig(rig)
+        # b_fun.set_ik_fk(rig, 0.0)
         return {'FINISHED'}
 
 
@@ -128,9 +143,6 @@ class SavePoseOperator(bpy.types.Operator):
 
     def execute(self, context):
         rig = context.view_layer.objects.active
-        # mapping = map_bones.load_mapping('rigify_uemannequin', anim = True)
-
-        # fk_bones = [fr for fr, to, type in mapping]
 
         oops.mode_set(mode = 'POSE')
         pose_bones = rig.pose.bones
