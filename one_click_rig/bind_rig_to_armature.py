@@ -103,7 +103,7 @@ def set_ik_follow_bone(context, rig, value):
         copy_loc.subtarget = value
         copy_rot = pose_bones[key].constraints.new('COPY_ROTATION')
         copy_rot.target = rig
-        copy_loc.subtarget = value
+        copy_rot.subtarget = value
     return
 
 ik_prop_bones = ['thigh_parent.L', 'thigh_parent.R', 'upper_arm_parent.L', 'upper_arm_parent.R']
