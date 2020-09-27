@@ -66,6 +66,7 @@ classes = (
     convert_to_rigify.ConvertToRigifyByMappingOperator,
     retarget_animation.RetargetAnimationOperator,
     reset_rigify.ResetRigifyOperator,
+    reset_rigify.ApplyScaleRigifyOperator,
     add_unreal_skeleton.AddUnrealSkeletonOperator,
     templates.SaveSkeletonDataOperator,
     panel.OCR_PT_OcrPanel,

@@ -50,3 +50,31 @@ class ResetRigifyOperator(bpy.types.Operator):
 
     def invoke(self, context, event):
         return self.execute(context)
+
+class ApplyScaleRigifyOperator(bpy.types.Operator):
+    """Applys scale to rigify rig"""
+    bl_idname = "object.ocr_apply_scale_rigify"
+    bl_label = "Apply scale to rigify"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    # example_prop: bpy.props.BoolProperty(name="Example prop", default=False)
+
+    @classmethod
+    def poll(cls, context):
+        return (context.space_data.type == 'VIEW_3D'
+            # and len(context.selected_objects) > 0
+            and context.view_layer.objects.active
+            and context.object.type == 'ARMATURE'
+            and (context.object.mode == 'OBJECT'))
+
+    def execute(self, context):
+        rig = context.view_layer.objects.active
+        oops.transform_apply(scale = True, rotation = False, location = False)
+
+        # https://www.reddit.com/r/blender/comments/eu3w6m/guide_how_to_scale_a_rigify_rig/
+        for b in rig.pose.bones:
+            for c in b.constraints:
+                if c.type == "STRETCH_TO":
+                    c.rest_length = 0
+                    
+        return {'FINISHED'}

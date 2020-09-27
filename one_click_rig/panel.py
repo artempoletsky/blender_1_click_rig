@@ -38,6 +38,8 @@ class OCR_PT_OcrPanel(bpy.types.Panel):
         row.operator("object.ocr_add_unreal_skeleton")
         row = col.row()
         row.operator("object.ocr_reset_rigify")
+        row = col.row()
+        row.operator("object.ocr_apply_scale_rigify")
 
         col.label(text = "Animation")
 
