@@ -5,3 +5,6 @@
 */__pycache__
 *.dae
 *.jpg
+*.TGA
+*.png
+/video
