@@ -43,6 +43,7 @@ class ResetRigifyOperator(bpy.types.Operator):
         oops.mode_set(mode = 'OBJECT')
         b_fun.set_def_bones_deform(rig, True)
         b_fun.show_layers(rig, False)
+        rig.data.bones['root'].use_deform = False
         rig.data.pop('one_click_rig')
         oops.mode_set(mode = 'POSE')
         return {'FINISHED'}

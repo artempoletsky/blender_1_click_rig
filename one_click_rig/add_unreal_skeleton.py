@@ -26,6 +26,12 @@ def add_ik_bones(rig, bones, matrices):
         bone.tail = b['tail']
         bone.matrix = matrices[b['name']]
 
+
+def apply_ik_bones(rig, bones):
+    b_fun.select_bones(rig, [b['name'] for b in bones])
+    pops.visual_transform_apply()
+    pops.armature_apply(selected = True)
+
 def link_parents(rig, bones, parents, rig_parents):
     eb = rig.data.edit_bones
     for b in bones:
@@ -105,10 +111,14 @@ class AddUnrealSkeletonOperator(bpy.types.Operator):
         bind.fix_twist_bones(context, rig)
 
         oops.mode_set(mode = 'POSE')
+        bind.set_ik_follow_bone(context, rig, True)
+        apply_ik_bones(rig, template['iks'])
+
         b_fun.show_layers(rig, True)
+        rig.data.bones['root'].use_deform = True
         b_fun.set_def_bones_deform(rig, False)
 
-        bind.set_ik_follow_bone(context, rig, True)
+
 
         bind.tag_rig(rig)
 
