@@ -61,10 +61,11 @@ If bones with this structure is named properly, and you have related mapping. Yo
 
 ## Convert character to rigify by mapping
 
-A combination of 4 operators:
+A combination of 4 operations:
 
 1. Rename armature by mapping. Same as unreal.
 2. Generate metarig from armature. Same as unreal.
 3. Rigify generate rig. Standart rigify button. 
 4. Then the script will add rigify `DEF-` prefix to the armature bones and replace it with generated rigify rig. 
+
 Now you have a rigify character. 
