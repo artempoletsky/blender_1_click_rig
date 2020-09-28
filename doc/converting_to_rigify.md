@@ -51,11 +51,12 @@ Only unreal armatures supported for now.
 
 Prepare character for the script. 
 
-1. An armature need to have 10 fingers, 3 bones each. 
-2. 2 arms, 2 legs. 3 bones for the each limb is required. Also the armature can have twist bones for limbs.
-3. Spine should contain 4 bones, and one neck bone and one head. 
-4. Separate toes and face rig is not supported for now. 
-5. Character can have breast bones.
+1. Spine should contain 4 bones, and one neck bone and one head. 
+2. 2 shoulder bones are required
+3. 2 arms, 2 legs. 3 bones for the each limb is required. Also the armature can have twist bones for limbs.
+4. An armature need to have 10 fingers, 3 bones each. 
+5. Separate toes and face rig is not supported for now. 
+6. Character can have breast bones.
 
 If bones with this structure is named properly, and you have related mapping. You can just select related mapping and press `Convert character to rigify by mapping`
 
