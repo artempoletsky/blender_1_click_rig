@@ -350,13 +350,3 @@ class OCR_PT_BoneMappingsPanel(bpy.types.Panel):
 
         if ui.edit_mapping:
             self.draw_mapping(col, ui)
-        else:
-            col.separator()
-            row = col.row()
-            row.operator("armature.ocr_rename_armature")
-            row.prop(ui, 'rename_reverse')
-            col.separator()
-            row = col.row()
-            row.operator("armature.ocr_add_prefix")
-            row.operator("armature.ocr_remove_prefix")
-            # props.name = ui.active_mapping

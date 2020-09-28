@@ -23,9 +23,19 @@ class OCR_PT_OcrPanel(bpy.types.Panel):
         row.operator("object.ocr_bind_rigify_to_armature")
         ui = context.window_manager.one_click_rig_ui
         col.separator()
+        # row = col.row()
+        col.label(text = 'Active mapping:')
+        col.prop(ui, 'active_mapping', text = '')
+        col.operator('object.ocr_convert_to_rigify_by_mapping', text = 'Convert char by mapping')
+
+        col.separator()
         row = col.row()
-        row.prop(ui, 'active_mapping', text = '')
-        row.operator('object.ocr_convert_to_rigify_by_mapping', text = 'Convert char by mapping')
+        row.operator("armature.ocr_rename_armature")
+        row.prop(ui, 'rename_reverse')
+        col.separator()
+        row = col.row()
+        row.operator("armature.ocr_add_prefix")
+        row.operator("armature.ocr_remove_prefix")
 
         #
         #
