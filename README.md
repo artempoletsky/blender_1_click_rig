@@ -8,4 +8,6 @@ A collection of rig operators for Blender.
 
 [Mappings and armature renaming](./doc/mappings.md)
 
+[Animation retargeting](./doc/animation.md)
+
 [Utility](./doc/utility.md)
