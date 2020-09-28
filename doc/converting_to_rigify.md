@@ -5,7 +5,7 @@
 
 A combination of 4 operators:
 
-1. Rename armature by mapping. The default `uemannequin_rigify` mapping will be used. If you delete `uemannequin_rigify` mapping, the script won't work. 
+1. Rename armature by mapping to the rigidy names. The default `uemannequin_rigify` mapping will be used. If you delete `uemannequin_rigify` mapping, the script won't work. 
 2. Generate metarig from armature
 3. Rigify generate rig. Standart rigify button. 
 4. Rename the original armature backwards to the original UE names.
@@ -54,4 +54,17 @@ Prepare character for the script.
 1. An armature need to have 10 fingers, 3 bones each. 
 2. 2 arms, 2 legs. 3 bones for the each limb is required. Also the armature can have twist bones for limbs.
 3. Spine should contain 4 bones, and one neck bone and one head. 
+4. Separate toes and face rig is not supported for now. 
+5. Character can have breast bones.
 
+If bones with this structure is named properly, and you have related mapping. You can just select related mapping and press `Convert character to rigify by mapping`
+
+## Convert character to rigify by mapping
+
+A combination of 4 operators:
+
+1. Rename armature by mapping. Same as unreal.
+2. Generate metarig from armature. Same as unreal.
+3. Rigify generate rig. Standart rigify button. 
+4. Then the script will add rigify `DEF-` prefix to the armature and replace it with generated rigify rig. 
+Now you have a rigify character. 
