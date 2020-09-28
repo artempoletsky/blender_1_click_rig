@@ -16,7 +16,7 @@ Usage: select unreal armature and run operator
 If you want to edit the metarig for characters that don't match the unreal mannequin bone structure, then you need to run this operators separately.
 
 ### Rename armature by mapping. 
-Go to [mappings page](./doc/mappings.md)
+Go to [mappings page](./mappings.md)
 
 ### Generate metarig from armature
 
@@ -63,7 +63,7 @@ If bones with this structure is named properly, and you have related mapping. Yo
 
 A combination of 4 operations:
 
-1. Rename armature by mapping. Same as unreal.
+1. Rename armature by mapping. You must have selected active mapping that matching the armature bones names. You can [create custom mappings](./mappings.md)
 2. Generate metarig from armature. Same as unreal.
 3. Rigify generate rig. Standart rigify button. 
 4. Then the script will add rigify `DEF-` prefix to the armature bones and replace it with generated rigify rig. 
