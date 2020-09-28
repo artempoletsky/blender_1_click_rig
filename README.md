@@ -6,6 +6,6 @@ A collection of rig operators for Blender.
 
 [Converting from rigify](./doc/converting_from_rigify.md)
 
-[Mappings and armature renaming](./doc/converting_from_rigify.md)
+[Mappings and armature renaming](./doc/mappings.md)
 
 [Utility](./doc/utility.md)
