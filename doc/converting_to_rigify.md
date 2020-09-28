@@ -1,7 +1,7 @@
 # Converting to rigify
 
 ## Unreal characters workflow
-## Convert UE character to rigify
+### Convert UE character to rigify
 
 A combination of 4 operators:
 
@@ -15,10 +15,10 @@ Usage: select unreal armature and run operator
 
 If you want to edit the metarig for characters that don't match the unreal mannequin bone structure, then you need to run this operators separately.
 
-## Rename armature by mapping. 
+### Rename armature by mapping. 
 Go to [mappings page](./doc/mappings.md)
 
-## Generate metarig from armature
+### Generate metarig from armature
 
 Creates rigify metarig using as input other armature with rigify names.
 
@@ -34,7 +34,7 @@ If one of the bones is missing, the script won't work.
 3. For toes the script will try to compute position of the end toe bone accordingly to the child mesh object.
 If mesh object doesn't have weight painted toes, they size and position likely will be wrong. 
 
-## Bind rigify rig to armature
+### Bind rigify rig to armature
 
 Copies the unreal armature to the rigify rig and makes constraints. 
 
@@ -47,7 +47,7 @@ Usage:
 
 Only unreal armatures supported for now.
 
-## Other characters workflow
+### Other characters workflow
 
 Prepare character for the script. 
 
@@ -66,5 +66,5 @@ A combination of 4 operators:
 1. Rename armature by mapping. Same as unreal.
 2. Generate metarig from armature. Same as unreal.
 3. Rigify generate rig. Standart rigify button. 
-4. Then the script will add rigify `DEF-` prefix to the armature and replace it with generated rigify rig. 
+4. Then the script will add rigify `DEF-` prefix to the armature bones and replace it with generated rigify rig. 
 Now you have a rigify character. 
