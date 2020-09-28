@@ -47,7 +47,7 @@ Usage:
 
 Only unreal armatures supported for now.
 
-### Other characters workflow
+## Other characters workflow
 
 Prepare character for the script. 
 
@@ -59,7 +59,7 @@ Prepare character for the script.
 
 If bones with this structure is named properly, and you have related mapping. You can just select related mapping and press `Convert character to rigify by mapping`
 
-## Convert character to rigify by mapping
+### Convert character to rigify by mapping
 
 A combination of 4 operations:
 
