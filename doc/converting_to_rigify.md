@@ -3,7 +3,7 @@
 ## Unreal characters workflow
 ### Convert UE character to rigify
 
-A combination of 4 operators:
+A combination of 5 operators:
 
 1. Rename armature by mapping to the rigidy names. The default `uemannequin_rigify` mapping will be used. If you delete `uemannequin_rigify` mapping, the script won't work. 
 2. Generate metarig from armature
