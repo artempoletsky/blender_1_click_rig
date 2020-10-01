@@ -241,7 +241,7 @@ class BindRigifyToArmatureOperator(bpy.types.Operator):
 
         copy_armature(context, rig, armature)
         mapping = BoneMapping('uemannequin_rigify', False)
-        create_copy_bones(context, rig)
+        create_copy_bones(context, rig, mapping)
         fix_twist_bones(context, rig)
 
         mesh = armature.children[0]
