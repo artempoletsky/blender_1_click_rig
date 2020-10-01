@@ -178,24 +178,24 @@ def create_copy_bones(context, rig, mapping):
         else:
             bone_names.append(bone.name)
 
-    aops.duplicate()
+
+
+    # aops.duplicate()
     eb = rig.data.edit_bones
-    for bone in context.selected_bones:
-        bone.name = bone.name.replace('001', 'copy')
-        bone.use_deform = False
-        # if bone.name in bones_mapping:
-        #     bone.parent = eb[bones_mapping[bone.name]]
-        # else:
-        #     bone.parent = None
+    for bone_name in bone_names:
+        copy_bone = eb.new(bone_name + '.copy')
+        source_bone = eb[bone_name]
+        copy_bone.head = source_bone.head.copy()
+        copy_bone.tail = source_bone.tail.copy()
+        copy_bone.matrix = source_bone.matrix.copy()
+        copy_bone.use_deform = False
 
     for bone_name in bone_names:
         copy_bone = eb[bone_name + '.copy']
         mapped_bone_name = mapping.get_name(bone_name, safe = False)
-        print(bone_name, mapped_bone_name)
         if mapped_bone_name:
             copy_bone.parent = eb['DEF-' + mapped_bone_name]
         elif 'DEF-' + bone_name in eb:
-            print(bone_name)
             copy_bone.parent = eb['DEF-' + bone_name]
 
 
