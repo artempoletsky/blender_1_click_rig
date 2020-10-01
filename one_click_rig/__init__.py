@@ -69,11 +69,12 @@ classes = (
     reset_rigify.ApplyScaleRigifyOperator,
     add_unreal_skeleton.AddUnrealSkeletonOperator,
     templates.SaveSkeletonDataOperator,
+    templates.RemoveSkeletonDataOperator,
     panel.OCR_PT_OcrPanel,
     mapping_editor.MappingEntry,
     mapping_editor.CreateMappingOperator,
     mapping_editor.OCR_PT_BoneMappingsPanel,
-    mapping_editor.OCRMappingPanelProps,
+    mapping_editor.OCR_IU_Props,
     mapping_editor.MappingRemoveEntryOperator,
     mapping_editor.MappingAddEntryOperator,
     mapping_editor.SaveMappingOperator,
@@ -105,7 +106,7 @@ def register():
 
     # version = ".".join(str(x) for x in bl_info["version"])
 
-    bpy.types.WindowManager.one_click_rig_ui = bpy.props.PointerProperty(type = mapping_editor.OCRMappingPanelProps)
+    bpy.types.WindowManager.one_click_rig_ui = bpy.props.PointerProperty(type = mapping_editor.OCR_IU_Props)
     preferences.register_keymaps()
     bpy.types.VIEW3D_MT_edit_mesh_vertices.append(vertex_menu_draw)
     bpy.types.VIEW3D_MT_edit_mesh_context_menu.append(vertext_context_menu_func)
@@ -117,7 +118,7 @@ def unregister():
     bpy.types.VIEW3D_MT_edit_mesh_vertices.remove(vertex_menu_draw)
     bpy.types.VIEW3D_MT_edit_mesh_context_menu.remove(vertext_context_menu_func)
 
-    del bpy.types.WindowManager.one_click_rig_version
+    del bpy.types.WindowManager.one_click_rig_ui
     preferences.unregister_keymaps()
 
 if __name__ == "__main__":

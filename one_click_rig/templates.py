@@ -1,6 +1,7 @@
 import bpy
 import json
 import os
+import re
 from mathutils import Matrix, Vector
 
 oops = bpy.ops.object
@@ -9,6 +10,17 @@ templates_dir = os.path.dirname(os.path.realpath(__file__)) + '/templates/'
 
 def get_template_file(name):
     return templates_dir + name + '.json'
+
+def has_template(name):
+    return os.path.exists(get_template_file(name))
+
+def get_templates(self, context):
+    # print(os.listdir(mappings_folder))
+    names = [re.sub('.json$', '', name) for name in os.listdir(templates_dir) if name.endswith('.json')]
+    return [(name, name, name) for name in names]
+
+def remove_template(name):
+    os.remove(get_template_file(name))
 
 def load_template(name):
     with open(get_template_file(name)) as json_file:
@@ -85,13 +97,15 @@ class SaveSkeletonDataOperator(bpy.types.Operator):
             and (context.object.mode == 'OBJECT'))
 
     def execute(self, context):
+        ui = context.window_manager.one_click_rig_ui
+
         ue_skeleton = context.view_layer.objects.active
         oops.mode_set(mode = 'EDIT')
         matrices = get_matrices(ue_skeleton)
         iks = get_iks(ue_skeleton)
         parents = get_parents(ue_skeleton)
 
-        save_template('ue_mannequin', {
+        save_template(ui.new_template_name, {
             'matrices': matrices,
             'iks': iks,
             'parents': parents
@@ -101,4 +115,32 @@ class SaveSkeletonDataOperator(bpy.types.Operator):
         return {'FINISHED'}
 
     def invoke(self, context, event):
-        return self.execute(context)
+        ui = context.window_manager.one_click_rig_ui
+        if has_template(ui.new_template_name):
+            return context.window_manager.invoke_confirm(self, event)
+        else:
+            return self.execute(context)
+
+class RemoveSkeletonDataOperator(bpy.types.Operator):
+    """Remove skeleton data template"""
+    bl_idname = "object.ocr_remove_skeleton_data"
+    bl_label = "Remove skeleton template"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    # example_prop: bpy.props.BoolProperty(name="Example prop", default=False)
+
+    @classmethod
+    def poll(cls, context):
+        return (context.space_data.type == 'VIEW_3D'
+            # and len(context.selected_objects) > 0
+            and context.view_layer.objects.active
+            and context.object.type == 'ARMATURE'
+            and (context.object.mode == 'OBJECT'))
+
+    def execute(self, context):
+        ui = context.window_manager.one_click_rig_ui
+        remove_template(ui.active_template)
+        return {'FINISHED'}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_confirm(self, event)
