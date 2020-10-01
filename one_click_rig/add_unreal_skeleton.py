@@ -45,6 +45,12 @@ def link_parents(rig, bones, parents, rig_parents):
             else:
                 print(parent_name)
 
+def count_spine_len(rig):
+    l = 0
+    for bone in rig.data.bones:
+        if bone.name.startswith('ORG-spine'):
+                l += 1
+    return l
 
 class AddUnrealSkeletonOperator(bpy.types.Operator):
     """Add unreal skeleton to rigify rig"""
@@ -63,9 +69,24 @@ class AddUnrealSkeletonOperator(bpy.types.Operator):
             and (context.object.mode == 'OBJECT'))
 
     def execute(self, context):
-        mapping = BoneMapping('uemannequin_rigify', True)
+
 
         rig = context.view_layer.objects.active
+
+        spine_len = count_spine_len(rig)
+        # print(spine_len)
+        if spine_len == 6:
+            mapping = BoneMapping('uemannequin_rigify', True)
+            reverse_mapping = BoneMapping('uemannequin_rigify', False)
+            template = templates.load_template('ue_mannequin')
+        elif spine_len == 7:
+            mapping = BoneMapping('uemannequin_neck2_rigify', True)
+            reverse_mapping = BoneMapping('uemannequin_neck2_rigify', False)
+            template = templates.load_template('ue_mannequin_neck2')
+        else:
+            self.report({'ERROR'}, 'Only spine length of 6 or 7 is supported')
+            return {'FINISHED'}
+
         rig.name = 'Armature'
 
         if 'one_click_rig' in rig.data:
@@ -80,7 +101,7 @@ class AddUnrealSkeletonOperator(bpy.types.Operator):
         def_prefix = 'DEF-'
         org_prefix = 'ORG-'
         def_bones = [b for b in eb if b.name.startswith(def_prefix)]
-        template = templates.load_template('ue_mannequin')
+
         rig_parents = {}
         for b in def_bones:
             name = mapping.get_name(b.name.strip(def_prefix))
@@ -112,8 +133,8 @@ class AddUnrealSkeletonOperator(bpy.types.Operator):
         aops.select_all(action = 'SELECT')
 
         link_parents(rig, context.selected_editable_bones, template['parents'], rig_parents)
-        return {'FINISHED'}
-        bind.create_copy_bones(context, rig)
+
+        bind.create_copy_bones(context, rig, reverse_mapping)
         bind.fix_twist_bones(context, rig)
 
         oops.mode_set(mode = 'POSE')
