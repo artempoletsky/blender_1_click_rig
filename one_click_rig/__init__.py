@@ -75,6 +75,7 @@ classes = (
     animation.AddKeyFrameOperator,
     panel.OCR_PT_AnimationPanel,
     panel.OCR_PT_OcrPanel,
+    panel.SetUESceneSettingsOperator,
     mapping_editor.MappingEntry,
     mapping_editor.CreateMappingOperator,
     mapping_editor.OCR_PT_BoneMappingsPanel,
