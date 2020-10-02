@@ -1,7 +1,7 @@
 bl_info = {
     "name": "1 click rig",
     "author": "Artem Poletsky",
-    "version": (1, 4, 0),
+    "version": (1, 4, 1),
     "blender": (2, 82, 0),
     "location": "",
     "description": "A collection of rig operators",
@@ -29,6 +29,7 @@ if "bpy" in locals():
     importlib.reload(mapping_editor)
     importlib.reload(pose_character)
     importlib.reload(templates)
+    importlib.reload(animation)
 
 else:
     from . import preferences
@@ -48,6 +49,7 @@ else:
     from . import mapping_editor
     from . import pose_character
     from . import templates
+    from . import animation
 
 import bpy
 
@@ -70,6 +72,8 @@ classes = (
     add_unreal_skeleton.AddUnrealSkeletonOperator,
     templates.SaveSkeletonDataOperator,
     templates.RemoveSkeletonDataOperator,
+    animation.AddKeyFrameOperator,
+    panel.OCR_PT_AnimationPanel,
     panel.OCR_PT_OcrPanel,
     mapping_editor.MappingEntry,
     mapping_editor.CreateMappingOperator,

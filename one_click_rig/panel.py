@@ -1,5 +1,29 @@
 import bpy
 
+class OCR_PT_AnimationPanel(bpy.types.Panel):
+    """
+    Animation panel
+    """
+    bl_label = '1 click rig'
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'Item'
+
+    @classmethod
+    def poll(cls, context):
+        return (context.space_data.type == 'VIEW_3D'
+            # and len(context.selected_objects) > 0
+            and context.view_layer.objects.active
+            and context.object.type == 'ARMATURE'
+            and (context.object.mode == 'POSE'))
+
+
+    def draw(self, context):
+        col = self.layout.column()
+        col.operator("anim.ocr_add_keyframe")
+
+
+
 class OCR_PT_OcrPanel(bpy.types.Panel):
     """
     Addon panel
