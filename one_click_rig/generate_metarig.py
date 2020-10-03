@@ -37,7 +37,30 @@ def get_foot_end(object, toe_bone_name):
     verts = get_vertices_in_vgroup(object, toe_bone_name)
     for v in verts:
         end = min(end, v.co.y)
+    if end == float('inf'):
+        return None
     return end
+
+def get_foot_sides_back(object, foot_bone_name, suffix):
+    side1 = float('inf')
+    side2 = -float('inf')
+    back = -float('inf')
+    verts = get_vertices_in_vgroup(object, foot_bone_name)
+    for v in verts:
+        side1 = min(side1, v.co.x)
+        side2 = max(side2, v.co.x)
+        back = max(back, v.co.y)
+    if side1 == float('inf'):
+        side1 = None
+    if side2 == -float('inf'):
+        side2 = None
+    if back == -float('inf'):
+        back = None
+    if suffix == 'R':
+        temp = side1
+        side1 = side2
+        side2 = temp
+    return side1, side2, back
 
 def save_axises(armature):
     oops.mode_set(mode = 'EDIT')
@@ -315,6 +338,15 @@ def create_leg(suffix, source_object, object, layer = 0):
     heel_x = heel_x - heel_width if suffix == 'L' else heel_x + heel_width
     heel_width = heel_width * 2 if suffix == 'L' else -2 * heel_width
 
+    if len(source_object.children):
+        side1, side2, back = get_foot_sides_back(source_object.children[0], 'foot.' + suffix, suffix)
+        if back:
+            heel_y = back
+        if side1 and side2:
+            heel_x = side1
+            heel_width = side2 - side1
+
+
     heel = object.data.edit_bones.new('heel.'+suffix.upper())
     heel.use_connect = False
     heel.parent = bones[2]
@@ -326,10 +358,12 @@ def create_leg(suffix, source_object, object, layer = 0):
 
     if len(source_object.children):
         foot_end = get_foot_end(source_object.children[0], 'toe.' + suffix)
-        if foot_end == float('inf'):
-            foot_end = bones[-1].head.y - 0.1
-        bones[-1].tail.y = foot_end
-        bones[-1].tail.z = bones[-1].head.z
+        toe_bone = bones[-1]
+        if not foot_end:
+            align_bone_to_vector(toe_bone, Vector((0, -1, 0)))
+        else:
+            toe_bone.tail.y = foot_end
+            toe_bone.tail.z = bones[-1].head.z
     # print(foot_end)
     params = save_rigify_type('thigh.' + suffix, 'limbs.super_limb', layer + 1, layer + 2)
     params['limb_type'] = 'leg'
