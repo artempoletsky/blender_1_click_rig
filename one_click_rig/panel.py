@@ -1,5 +1,49 @@
 import bpy
 
+
+class SetUESceneSettingsOperator(bpy.types.Operator):
+    """Set UE scene settings"""
+    bl_idname = "object.ocr_set_ue_scene_settings"
+    bl_label = "Set UE settings"
+    bl_options = {'REGISTER', 'UNDO'}
+    #
+    # @classmethod
+    # def poll(cls, context):
+    #     return (context.space_data.type == 'VIEW_3D')
+
+    def execute(self, context):
+        context.scene.unit_settings.scale_length = 0.01
+        context.scene.render.fps = 30
+        return {'FINISHED'}
+
+
+class OCR_PT_AnimationPanel(bpy.types.Panel):
+    """
+    Animation panel
+    """
+    bl_label = '1 click rig. Animation edit'
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'Item'
+
+    @classmethod
+    def poll(cls, context):
+        return (context.space_data.type == 'VIEW_3D'
+            # and len(context.selected_objects) > 0
+            and context.view_layer.objects.active
+            and context.object.type == 'ARMATURE'
+            and (context.object.mode == 'POSE'))
+
+
+    def draw(self, context):
+        col = self.layout.column()
+        col.operator("anim.ocr_add_keyframe", text = 'Add keyframe')
+        col.operator("pose.constraints_clear", text = 'Clear constraints')
+        col.operator("nla.bake")
+        col.operator_context = 'INVOKE_DEFAULT'
+
+
+
 class OCR_PT_OcrPanel(bpy.types.Panel):
     """
     Addon panel
@@ -10,6 +54,17 @@ class OCR_PT_OcrPanel(bpy.types.Panel):
     bl_category = 'Rigify'
 
     def draw_object(self, col, context):
+        # col.separator()
+
+        if context.object.type == 'ARMATURE':
+            col.label(text = 'Armature appearance:')
+            row = col.row()
+            arm = context.object.data
+            # row.prop(arm, "show_names", text="Names")
+            row.prop(arm, "show_axes", text="Axes")
+            row.prop(context.object, "show_in_front", text="In Front")
+        col.separator()
+
         col.label(text="Converting to Rigify operators:")
         row = col.row()
         row.operator("object.ocr_convert_to_rigify")
@@ -79,13 +134,23 @@ class OCR_PT_OcrPanel(bpy.types.Panel):
         row = col.row()
         row.operator("armature.ocr_merge_bones_with_vgroups")
 
+    def draw_scene(self, col, context):
+        col.label(text = 'Scene settings:')
+        row = col.row()
+        row.prop(context.scene.unit_settings, "scale_length")
+        row.prop(context.scene.render, "fps")
+        col.operator('object.ocr_set_ue_scene_settings')
+
     def draw(self, context):
-        if not context.object:
-            return
         layout = self.layout
         col = layout.column()
+        if not context.object:
+            self.draw_scene(col, context)
+            return
+
         mode = context.object.mode
         if mode == 'OBJECT':
+            self.draw_scene(col, context)
             self.draw_object(col, context)
         elif mode == 'EDIT':
             self.draw_edit(col, context)

@@ -58,7 +58,7 @@ class RetargetAnimationOperator(bpy.types.Operator):
     bl_label = "(OCR) retarget animation"
     bl_options = {'REGISTER', 'UNDO'}
 
-    # example_prop: bpy.props.BoolProperty(name="Example prop", default=False)
+    set_anim_length: bpy.props.BoolProperty(name="Set animation length", default=True)
 
     @classmethod
     def poll(cls, context):
@@ -77,7 +77,14 @@ class RetargetAnimationOperator(bpy.types.Operator):
 
         b_fun.set_ik_fk(rig, 1.0)
 
-        source.select_set(False)
+        # source.select_set(False)
+        oops.mode_set(mode = 'OBJECT')
+        if self.set_anim_length:
+            anim_data = source.animation_data
+            curves = anim_data.action.fcurves
+            last_frame = curves[0].keyframe_points[-1]
+            l = int(last_frame.co[0])
+            context.scene.frame_end = l
         # self.prefs = preferences.get_prefs()
 
         # self.report({'INFO'}, self.prefs.hello)

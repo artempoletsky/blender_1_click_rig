@@ -164,9 +164,7 @@ def disable_stretch(context, rig):
     return
 
 
-def create_copy_bones(context, rig):
-
-    mapping = BoneMapping('uemannequin_rigify', False)
+def create_copy_bones(context, rig, mapping):
 
     oops.mode_set(mode = 'EDIT')
     aops.select_all(action = 'SELECT')
@@ -180,15 +178,17 @@ def create_copy_bones(context, rig):
         else:
             bone_names.append(bone.name)
 
-    aops.duplicate()
+
+
+    # aops.duplicate()
     eb = rig.data.edit_bones
-    for bone in context.selected_bones:
-        bone.name = bone.name.replace('001', 'copy')
-        bone.use_deform = False
-        # if bone.name in bones_mapping:
-        #     bone.parent = eb[bones_mapping[bone.name]]
-        # else:
-        #     bone.parent = None
+    for bone_name in bone_names:
+        copy_bone = eb.new(bone_name + '.copy')
+        source_bone = eb[bone_name]
+        copy_bone.head = source_bone.head.copy()
+        copy_bone.tail = source_bone.tail.copy()
+        copy_bone.matrix = source_bone.matrix.copy()
+        copy_bone.use_deform = False
 
     for bone_name in bone_names:
         copy_bone = eb[bone_name + '.copy']
@@ -240,7 +240,8 @@ class BindRigifyToArmatureOperator(bpy.types.Operator):
         rig.show_in_front = True
 
         copy_armature(context, rig, armature)
-        create_copy_bones(context, rig)
+        mapping = BoneMapping('uemannequin_rigify', False)
+        create_copy_bones(context, rig, mapping)
         fix_twist_bones(context, rig)
 
         mesh = armature.children[0]

@@ -3,7 +3,7 @@ import re
 from . import preferences
 import os
 
-from . import map_bones
+from . import map_bones, templates
 
 oops = bpy.ops.object
 
@@ -254,7 +254,7 @@ class RemovePrefixOperator(bpy.types.Operator):
 
 
 
-class OCRMappingPanelProps(bpy.types.PropertyGroup):
+class OCR_IU_Props(bpy.types.PropertyGroup):
 
 
     def update_edit_mapping(self, value):
@@ -298,12 +298,20 @@ class OCRMappingPanelProps(bpy.types.PropertyGroup):
         default = False
         )
 
+    new_template_name: bpy.props.StringProperty()
+    active_template: bpy.props.EnumProperty(
+        name = "Template",
+        description = "Saved templates",
+        items = templates.get_templates,
+        default = None
+        )
+
 
 class OCR_PT_BoneMappingsPanel(bpy.types.Panel):
     """
     Addon panel
     """
-    bl_label = '1 click rig. Bone mappings'
+    bl_label = '1 click rig. Mappings and templates'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'Rigify'
@@ -350,3 +358,10 @@ class OCR_PT_BoneMappingsPanel(bpy.types.Panel):
 
         if ui.edit_mapping:
             self.draw_mapping(col, ui)
+        else:
+            col.separator()
+            col.prop(ui, 'active_template')
+            col.operator("object.ocr_remove_skeleton_data", text = 'Remove template')
+            col.label(text = 'New template name:')
+            col.prop(ui, 'new_template_name', text = '')
+            col.operator("object.ocr_save_skeleton_data")

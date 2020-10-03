@@ -5,6 +5,7 @@ from .map_bones import BoneMapping
 from mathutils import Vector, Matrix, geometry
 import math
 from . import bone_functions as b_fun
+import re
 
 oops = bpy.ops.object
 aops = bpy.ops.armature
@@ -36,7 +37,30 @@ def get_foot_end(object, toe_bone_name):
     verts = get_vertices_in_vgroup(object, toe_bone_name)
     for v in verts:
         end = min(end, v.co.y)
+    if end == float('inf'):
+        return None
     return end
+
+def get_foot_sides_back(object, foot_bone_name, suffix):
+    side1 = float('inf')
+    side2 = -float('inf')
+    back = -float('inf')
+    verts = get_vertices_in_vgroup(object, foot_bone_name)
+    for v in verts:
+        side1 = min(side1, v.co.x)
+        side2 = max(side2, v.co.x)
+        back = max(back, v.co.y)
+    if side1 == float('inf'):
+        side1 = None
+    if side2 == -float('inf'):
+        side2 = None
+    if back == -float('inf'):
+        back = None
+    if suffix == 'R':
+        temp = side1
+        side1 = side2
+        side2 = temp
+    return side1, side2, back
 
 def save_axises(armature):
     oops.mode_set(mode = 'EDIT')
@@ -88,6 +112,8 @@ def set_rigify_types(object):
         for key, value in rigify_type.items():
             if key == 'rigify_type':
                 bone.rigify_type = value
+            # elif key == 'copy_rotaion_axes':
+            #     b_fun.set_array_indices(bone.rigify_parameters.copy_rotation_axes, value)
             elif key == 'tweak_layer':
                 b_fun.set_array_indices(bone.rigify_parameters.tweak_layers, [value])
             elif key == 'fk_layer':
@@ -96,9 +122,15 @@ def set_rigify_types(object):
                 setattr(bone.rigify_parameters, key, value)
 
 def create_tentakle(spine_arr, source_armature, object, layer = 0):
-    bones = create_bone_chain(spine_arr, source_armature, object, layer = 0)
-    rigify_parameters = save_rigify_type(bone.name, 'limbs.simple_tentacle', layer + fk_layer_offset, layer + tweak_layer_offset)
+    bones = create_bone_chain(spine_arr, source_armature, object, layer = layer)
+    is_tail = bool(re.findall(r'(?i)tail', spine_arr[0]))
+    rigify_type = 'spines.basic_tail' if is_tail else 'limbs.simple_tentacle'
+
+    rigify_parameters = save_rigify_type(bones[0].name, rigify_type, layer + 1, layer + 1)
+    rigify_parameters['copy_rotation_axes'] = [True, False, True]
     return bones, rigify_parameters
+
+EX_BONES = []
 
 def create_bone_chain(spine_arr, source_armature, object, layer = 0):
     # print(spine_arr)
@@ -141,6 +173,7 @@ def create_bone_chain(spine_arr, source_armature, object, layer = 0):
         target_bone.tail = tail
 
         created_bones.append(target_bone)
+        EX_BONES.append(target_bone.name)
 
         if parent:
             target_bone.parent = parent
@@ -177,9 +210,7 @@ def add_single_bone(name, source_armature, object, direction_bone_name = None, l
 
     if direction_bone_name:
         align_bone_to_point(bone, get_bone_position(source_armature, direction_bone_name))
-    else:
-        if not direction_vector:
-            direction_vector = Vector((0, -1, 0))
+    elif direction_vector:
         align_bone_to_vector(bone, direction_vector)
 
     if parent_name:
@@ -189,7 +220,7 @@ def add_single_bone(name, source_armature, object, direction_bone_name = None, l
     # b_fun.align_bone_x_axis(bone, saved_y_axises[name])
 
     rigify_parameters = save_rigify_type(bone.name, 'basic.super_copy', layer + fk_layer_offset, layer + tweak_layer_offset)
-
+    EX_BONES.append(bone.name)
     return bone, rigify_parameters
 
 def get_spine_bones(source_armature):
@@ -307,6 +338,15 @@ def create_leg(suffix, source_object, object, layer = 0):
     heel_x = heel_x - heel_width if suffix == 'L' else heel_x + heel_width
     heel_width = heel_width * 2 if suffix == 'L' else -2 * heel_width
 
+    if len(source_object.children):
+        side1, side2, back = get_foot_sides_back(source_object.children[0], 'foot.' + suffix, suffix)
+        if back:
+            heel_y = back
+        if side1 and side2:
+            heel_x = side1
+            heel_width = side2 - side1
+
+
     heel = object.data.edit_bones.new('heel.'+suffix.upper())
     heel.use_connect = False
     heel.parent = bones[2]
@@ -318,14 +358,19 @@ def create_leg(suffix, source_object, object, layer = 0):
 
     if len(source_object.children):
         foot_end = get_foot_end(source_object.children[0], 'toe.' + suffix)
-        if foot_end == float('inf'):
-            foot_end = bones[-1].head.y - 0.1
-        bones[-1].tail.y = foot_end
-        bones[-1].tail.z = bones[-1].head.z
+        toe_bone = bones[-1]
+        if not foot_end:
+            align_bone_to_vector(toe_bone, Vector((0, -1, 0)))
+        else:
+            toe_bone.tail.y = foot_end
+            toe_bone.tail.z = bones[-1].head.z
     # print(foot_end)
     params = save_rigify_type('thigh.' + suffix, 'limbs.super_limb', layer + 1, layer + 2)
     params['limb_type'] = 'leg'
     params['rotation_axis'] = 'x'
+
+    EX_BONES.append('thigh.' + suffix + '.001')
+    EX_BONES.append('shin.' + suffix + '.001')
 
 def create_arm(suffix, source_armature, object, palm_no, layer = 0):
     spine = ['upper_arm.' + suffix, 'forearm.' + suffix, 'hand.' + suffix]
@@ -343,6 +388,8 @@ def create_arm(suffix, source_armature, object, palm_no, layer = 0):
         if bone.name.startswith('hand') and palm_no:
             vec = palm_no
         b_fun.align_bone_x_axis(bone, vec)
+    EX_BONES.append('upper_arm.' + suffix + '.001')
+    EX_BONES.append('forearm.' + suffix + '.001')
     params = save_rigify_type('upper_arm.' + suffix, 'limbs.super_limb', layer + 1, layer + 2)
     params['rotation_axis'] = 'x'
 
@@ -360,6 +407,24 @@ def compute_palm(source_armature, suffix):
     palm_no = -geometry.normal((h, i, r))
     palm_no *= (h - m).length * 1
     return palm_co, palm_no
+
+
+def detect_bone_chains(bones):
+    bones = [b for b in bones if b.name not in EX_BONES]
+    chains = []
+    for b in bones:
+        if not b.parent:
+            continue
+        # root of the chain
+        if b.parent.name in EX_BONES:
+            parent = b
+            chain = [b.name]
+            chains.append(chain)
+            while len(parent.children):
+                parent = parent.children[0]
+                chain.append(parent.name)
+
+    return chains
 
 
 class GenerateMetarigOperator(bpy.types.Operator):
@@ -385,6 +450,8 @@ class GenerateMetarigOperator(bpy.types.Operator):
 
         scene_scale['scale'] = context.scene.unit_settings.scale_length
         # print(scene_scale)
+        EX_BONES.clear()
+        EX_BONES.append('root')
 
 
         # save_axises(source_armature)
@@ -415,10 +482,10 @@ class GenerateMetarigOperator(bpy.types.Operator):
             b_fun.align_bone_x_axis(bone, -global_z_axis.cross(bone.vector))
             params['make_widget'] = False
 
-        bone, params = add_single_bone('breast.L', source_armature, context.object, layer = 3)
+        bone, params = add_single_bone('breast.L', source_armature, context.object, layer = 3, direction_vector = Vector((0, -1, 0)))
         if bone:
             b_fun.align_bone_x_axis(bone, Vector((-1, 0, 0)))
-        bone, params = add_single_bone('breast.R', source_armature, context.object, layer = 3)
+        bone, params = add_single_bone('breast.R', source_armature, context.object, layer = 3, direction_vector = Vector((0, -1, 0)))
         if bone:
             b_fun.align_bone_x_axis(bone, Vector((-1, 0, 0)))
 
@@ -445,10 +512,17 @@ class GenerateMetarigOperator(bpy.types.Operator):
 
 
 
-        # for bone in source_armature.bones:
-        #     if not mapping.get_name(bone.name, safe = False) and not bone.name.startswith('ik') and not bone.name == 'root':
-        #         parent_name = bone.parent.name if bone.parent else None
-        #         add_single_bone(bone.name, parent_name, source_armature, context.object, layer = 3)
+        for bone in source_armature.bones:
+            if bone.name.startswith('ik'):
+                EX_BONES.append(bone.name)
+
+        chains = detect_bone_chains(source_armature.bones)
+        # print(chains)
+        for c in chains:
+            if len(c) == 1:
+                add_single_bone(c[0], source_armature, context.object, layer = 3)
+            else:
+                create_tentakle(c, source_armature, context.object, layer = 3 )
 
         b_fun.set_array_indices(context.object.data.layers, [0, 3, 5, 7, 10, 13, 16])
         oops.mode_set(mode = 'POSE')
