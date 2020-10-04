@@ -150,22 +150,17 @@ def create_bone_chain(spine_arr, source_armature, object, layer = 0):
         head_bone = get_bone(source_armature, head_bone_name)
         if head_bone is None:
             print(spine_arr[i] + ' passed head')
-            continue
+            break
         head = head_bone.head_local
 
         q_diff = None
 
-
-        if i == spine_len - 1:
-            y_vec = parent.vector
-            y_vec.normalize()
-            tail = head + y_vec * head_bone.length
-
-        else:
+        tail = None
+        if i < spine_len - 1:
             tail = get_bone_position(source_armature, spine_arr[i + 1])
-            if tail is None:
-                print(spine_arr[i + 1] + ' passed tail')
-                continue
+
+        if tail is None:
+            tail = head_bone.tail_local
 
         target_bone = target_bones.new(spine_arr[i])
 
@@ -184,11 +179,19 @@ def create_bone_chain(spine_arr, source_armature, object, layer = 0):
 
         parent = target_bone
 
+    last_bone = parent
+
+    if last_bone and last_bone.parent:
+        parent = last_bone.parent
+        align_bone_to_vector(last_bone, last_bone.parent.vector)
+        # y_vec = parent.vector
+        # y_vec.normalize()
+        # tail = head + y_vec * head_bone.length
+
     return created_bones
 
 def align_bone_to_vector(edit_bone, vector):
-    vector.normalize()
-    edit_bone.tail = edit_bone.head + vector * edit_bone.length
+    edit_bone.tail = edit_bone.head + vector.normalized() * edit_bone.length
 
 def align_bone_to_point(edit_bone, point):
     vector = point - edit_bone.head
@@ -238,6 +241,8 @@ def get_spine_bones(source_armature):
 
 def create_spine(source_armature, object, head_chain_length):
     spine = get_spine_bones(source_armature)
+    if len(spine) < 6 or len(spine) > 7:
+        raise Exception("Can't create a spine. Only 6 or 7 length spines are supported.")
     bones = create_bone_chain(spine, source_armature, object, layer = 3)
     align_bone_to_vector(bones[-1], Vector((0, 0, 1)))
 
@@ -293,7 +298,8 @@ def create_thumb(suffix, source_object, object, palm_coord, palm_normal):
     source_armature = source_object.data
     spine = ['thumb.01.' + suffix, 'thumb.02.' + suffix, 'thumb.03.' + suffix]
     bones = create_bone_chain(spine, source_armature, object, layer = 5)
-
+    if not bones:
+        return
     if suffix == 'R':
         palm_normal = - palm_normal
     point = palm_coord + palm_normal / 8
@@ -311,7 +317,8 @@ def create_finger(name, suffix, source_object, object, palm_coord, palm_normal):
     source_armature = source_object.data
     spine = [name + '.01.' + suffix, name + '.02.' + suffix, name + '.03.' + suffix]
     bones = create_bone_chain(spine, source_armature, object, layer = 5)
-
+    if not bones:
+        return
     if suffix == 'R':
         palm_normal = - palm_normal
     point = palm_coord + palm_normal
@@ -330,6 +337,9 @@ def create_leg(suffix, source_object, object, layer = 0):
     source_armature = source_object.data
     spine = ['thigh.' + suffix, 'shin.' + suffix, 'foot.' + suffix, 'toe.' + suffix]
     bones = create_bone_chain(spine, source_armature, object, layer = layer)
+
+    if len(bones) != 4:
+        raise Exception('Can\'t create leg (' + suffix + ')')
 
     heel_width = 0.05 / scene_scale['scale']
     # print(scene_scale)
@@ -364,17 +374,26 @@ def create_leg(suffix, source_object, object, layer = 0):
         else:
             toe_bone.tail.y = foot_end
             toe_bone.tail.z = bones[-1].head.z
+            toe_bone.tail.x = bones[-1].head.x
+
+    foot_bone = bones[-2]
+
+    b_fun.align_bone_x_axis(foot_bone, Vector((1, 0, 0)))
+
     # print(foot_end)
     params = save_rigify_type('thigh.' + suffix, 'limbs.super_limb', layer + 1, layer + 2)
     params['limb_type'] = 'leg'
     params['rotation_axis'] = 'x'
 
+    # adding twist bones to exclude list even if we don't create them
     EX_BONES.append('thigh.' + suffix + '.001')
     EX_BONES.append('shin.' + suffix + '.001')
 
 def create_arm(suffix, source_armature, object, palm_no, layer = 0):
     spine = ['upper_arm.' + suffix, 'forearm.' + suffix, 'hand.' + suffix]
     bones = create_bone_chain(spine, source_armature, object, layer = layer)
+    if len(bones) != 3:
+        raise Exception('Can\'t create arm (' + suffix + ')')
 
     # b_fun.align_bone_x_axis(bones[1], -saved_z_axises[bones[1].name])
     # b_fun.align_bone_x_axis(bones[0], -saved_z_axises[bones[0].name])
@@ -384,7 +403,9 @@ def create_arm(suffix, source_armature, object, palm_no, layer = 0):
     else:
         align_bone_to_vector(bones[-1], bones[-2].vector)
     for bone in bones:
-        vec = Vector((0, 0, -1)) if suffix == 'L' else Vector((0, 0, 1))
+        # vec = Vector((0, 0, -1)) if suffix == 'L' else Vector((0, 0, 1))
+        # TODO: compute normal of the arm
+        vec = -bone.tail if suffix == 'L' else bone.tail
         if bone.name.startswith('hand') and palm_no:
             vec = palm_no
         b_fun.align_bone_x_axis(bone, vec)
@@ -469,46 +490,58 @@ class GenerateMetarigOperator(bpy.types.Operator):
         bpy.ops.armature.rigify_add_bone_groups()
         create_layers(context.object.data)
 
-        create_spine(source_armature, context.object, self.head_chain_length)
+        try:
+            create_spine(source_armature, context.object, self.head_chain_length)
+
+            bone, params = add_single_bone('shoulder.L', source_armature, context.object, direction_bone_name = 'upper_arm.L', layer = 3)
+            global_z_axis = Vector((0, 0, 1))
+            if bone:
+                b_fun.align_bone_x_axis(bone, -global_z_axis.cross(bone.vector))
+                params['make_widget'] = False
+            else:
+                raise Exception('Can\'t create shoulder.L bone')
+            bone, params = add_single_bone('shoulder.R', source_armature, context.object, direction_bone_name = 'upper_arm.R', layer = 3)
+            if bone:
+                b_fun.align_bone_x_axis(bone, -global_z_axis.cross(bone.vector))
+                params['make_widget'] = False
+            else:
+                raise Exception('Can\'t create shoulder.R bone')
+
+            bone, params = add_single_bone('breast.L', source_armature, context.object, layer = 3, direction_vector = Vector((0, -1, 0)))
+            if bone:
+                b_fun.align_bone_x_axis(bone, Vector((-1, 0, 0)))
+            bone, params = add_single_bone('breast.R', source_armature, context.object, layer = 3, direction_vector = Vector((0, -1, 0)))
+            if bone:
+                b_fun.align_bone_x_axis(bone, Vector((-1, 0, 0)))
+
+            co, no = compute_palm(source_armature, 'L')
+            create_arm('L', source_armature, context.object, no, layer = 7)
+
+            create_thumb('L', source_object, context.object, co, no)
+
+            create_finger('f_index', 'L', source_object, context.object, co, no)
+            create_finger('f_middle', 'L', source_object, context.object, co, no)
+            create_finger('f_ring', 'L', source_object, context.object, co, no)
+            create_finger('f_pinky', 'L', source_object, context.object, co, no)
+
+            co, no = compute_palm(source_armature, 'R')
+            create_arm('R', source_armature, context.object, no, layer = 10)
+
+            create_thumb('R', source_object, context.object, co, no)
+            create_finger('f_index', 'R', source_object, context.object, co, no)
+            create_finger('f_middle', 'R', source_object, context.object, co, no)
+            create_finger('f_ring', 'R', source_object, context.object, co, no)
+            create_finger('f_pinky', 'R', source_object, context.object, co, no)
+
+            create_leg('L', source_object, context.object, layer = 13)
+            create_leg('R', source_object, context.object, layer = 16)
+        except Exception as e:
+            self.report({'ERROR'}, e.args[0])
+            return {'FINISHED'}
 
 
-        bone, params = add_single_bone('shoulder.L', source_armature, context.object, direction_bone_name = 'upper_arm.L', layer = 3)
-        global_z_axis = Vector((0, 0, 1))
-        if bone:
-            b_fun.align_bone_x_axis(bone, -global_z_axis.cross(bone.vector))
-            params['make_widget'] = False
-        bone, params = add_single_bone('shoulder.R', source_armature, context.object, direction_bone_name = 'upper_arm.R', layer = 3)
-        if bone:
-            b_fun.align_bone_x_axis(bone, -global_z_axis.cross(bone.vector))
-            params['make_widget'] = False
+        # return {'FINISHED'}
 
-        bone, params = add_single_bone('breast.L', source_armature, context.object, layer = 3, direction_vector = Vector((0, -1, 0)))
-        if bone:
-            b_fun.align_bone_x_axis(bone, Vector((-1, 0, 0)))
-        bone, params = add_single_bone('breast.R', source_armature, context.object, layer = 3, direction_vector = Vector((0, -1, 0)))
-        if bone:
-            b_fun.align_bone_x_axis(bone, Vector((-1, 0, 0)))
-
-        co, no = compute_palm(source_armature, 'L')
-        create_arm('L', source_armature, context.object, no, layer = 7)
-
-        create_thumb('L', source_object, context.object, co, no)
-        create_finger('f_index', 'L', source_object, context.object, co, no)
-        create_finger('f_middle', 'L', source_object, context.object, co, no)
-        create_finger('f_ring', 'L', source_object, context.object, co, no)
-        create_finger('f_pinky', 'L', source_object, context.object, co, no)
-
-        co, no = compute_palm(source_armature, 'R')
-        create_arm('R', source_armature, context.object, no, layer = 10)
-
-        create_thumb('R', source_object, context.object, co, no)
-        create_finger('f_index', 'R', source_object, context.object, co, no)
-        create_finger('f_middle', 'R', source_object, context.object, co, no)
-        create_finger('f_ring', 'R', source_object, context.object, co, no)
-        create_finger('f_pinky', 'R', source_object, context.object, co, no)
-
-        create_leg('L', source_object, context.object, layer = 13)
-        create_leg('R', source_object, context.object, layer = 16)
 
 
 
