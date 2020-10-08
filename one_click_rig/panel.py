@@ -105,6 +105,10 @@ class OCR_PT_OcrPanel(bpy.types.Panel):
         row.operator("object.ocr_reset_rigify")
         row = col.row()
         row.operator("object.ocr_apply_scale_rigify")
+        # row = col.row()
+        # row.operator("armature.ocr_fix_twist_bones")
+        # row.operator("armature.ocr_unfix_twist_bones")
+
 
         col.label(text = "Animation")
 

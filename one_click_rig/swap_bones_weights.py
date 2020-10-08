@@ -1,18 +1,6 @@
 import bpy
 from . import preferences
-def swap_vertex_groups_names(object, name1, name2):
-    v_group1 = object.vertex_groups.get(name1)
-    v_group2 = object.vertex_groups.get(name2)
-    if not v_group1 and not v_group2:
-        return
-    if not v_group2:
-        v_group1.name = name2
-    if not v_group1:
-        v_group2.name = name1
-
-    v_group1.name = 'temp_renaming_vgroup_name'
-    v_group2.name = name1
-    v_group1.name = name2
+from . import bone_functions as b_fun
 
 class SwapBonesWeightsOperator(bpy.types.Operator):
     """Swap bones weights"""
@@ -33,10 +21,7 @@ class SwapBonesWeightsOperator(bpy.types.Operator):
     def execute(self, context):
         bones = context.selected_bones if context.object.mode  == 'EDIT' else context.selected_pose_bones
         # print(bones)
-        children = context.object.children
-
-        for child in children:
-            swap_vertex_groups_names(child, bones[0].name, bones[1].name)
+        b_fun.swap_childrens_vgroups_names(context.object, bones[0].name, bones[1].name)
         return {'FINISHED'}
 
     def invoke(self, context, event):
