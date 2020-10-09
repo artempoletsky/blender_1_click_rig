@@ -72,9 +72,7 @@ def unfix_twist_bones(context, rig, swap_vgroups = False):
 
     pose_bones = rig.pose.bones
     for i, b in enumerate(limb_bones):
-        c = pose_bones[b + '.copy'].constraints
-        while c:
-            c.remove(c[0])
+        rig.data.edit_bones[b + '.copy'].parent = rig.data.edit_bones[parent_bones[i]]
 
 def fix_twist_bones(context, rig, swap_vgroups = False):
     oops.mode_set(mode = 'EDIT')
@@ -87,26 +85,13 @@ def fix_twist_bones(context, rig, swap_vgroups = False):
         if swap_vgroups:
             b_fun.swap_childrens_vgroups_names(rig, b, limb_bones[i])
 
+    for i, b in enumerate(limb_bones):
+        rig.data.edit_bones[b + '.copy'].parent = rig.data.edit_bones[parent_bones[i] + '.001']
+
     oops.mode_set(mode = 'POSE')
     # limb_bones = ['thigh_l.copy','thigh_r.copy', 'upperarm_l.copy', 'upperarm_r.copy']
 
-    pose_bones = rig.pose.bones
-    for i, b in enumerate(limb_bones):
-        b += '.copy'
-        constr = pose_bones[b].constraints.new('TRANSFORM')
-        constr.map_from = constr.map_to = 'ROTATION'
-        constr.target = rig
-        constr.subtarget = parent_bones[i]+'.001'
-        constr.map_to_x_from = 'Y'
-        constr.target_space = constr.owner_space = 'LOCAL'
 
-        if b in ['upperarm_r.copy','thigh_l.copy']:
-            constr.to_max_x_rot = -1.5708
-        else:
-            constr.to_max_x_rot = 1.5708
-        constr.from_max_y_rot = 1.5708 / 2
-        constr.use_motion_extrapolate = True
-    # oops.mode_set(mode = 'POSE')
     return
 
 def set_ik_follow_bone(context, rig, value):

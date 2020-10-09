@@ -133,8 +133,10 @@ def swap_vertex_groups_names(object, name1, name2):
         return
     if not v_group2:
         v_group1.name = name2
+        return
     if not v_group1:
         v_group2.name = name1
+        return
 
     v_group1.name = 'temp_renaming_vgroup_name'
     v_group2.name = name1
