@@ -72,9 +72,7 @@ def unfix_twist_bones(context, rig, swap_vgroups = False):
 
     pose_bones = rig.pose.bones
     for i, b in enumerate(limb_bones):
-        c = pose_bones[b + '.copy'].constraints
-        while c:
-            c.remove(c[0])
+        rig.data.edit_bones[b + '.copy'].parent = rig.data.edit_bones[parent_bones[i]]
 
 def fix_twist_bones(context, rig, swap_vgroups = False):
     oops.mode_set(mode = 'EDIT')
@@ -87,26 +85,13 @@ def fix_twist_bones(context, rig, swap_vgroups = False):
         if swap_vgroups:
             b_fun.swap_childrens_vgroups_names(rig, b, limb_bones[i])
 
+    for i, b in enumerate(limb_bones):
+        rig.data.edit_bones[b + '.copy'].parent = rig.data.edit_bones[parent_bones[i] + '.001']
+
     oops.mode_set(mode = 'POSE')
     # limb_bones = ['thigh_l.copy','thigh_r.copy', 'upperarm_l.copy', 'upperarm_r.copy']
 
-    pose_bones = rig.pose.bones
-    for i, b in enumerate(limb_bones):
-        b += '.copy'
-        constr = pose_bones[b].constraints.new('TRANSFORM')
-        constr.map_from = constr.map_to = 'ROTATION'
-        constr.target = rig
-        constr.subtarget = parent_bones[i]+'.001'
-        constr.map_to_x_from = 'Y'
-        constr.target_space = constr.owner_space = 'LOCAL'
 
-        if b in ['upperarm_r.copy','thigh_l.copy']:
-            constr.to_max_x_rot = -1.5708
-        else:
-            constr.to_max_x_rot = 1.5708
-        constr.from_max_y_rot = 1.5708 / 2
-        constr.use_motion_extrapolate = True
-    # oops.mode_set(mode = 'POSE')
     return
 
 def set_ik_follow_bone(context, rig, value):
@@ -239,6 +224,16 @@ def create_copy_bones(context, rig, mapping):
 
     return
 
+def remove_armature_modifier(object):
+    for m in object.modifiers:
+        if m.type == 'ARMATURE':
+            object.modifiers.remove(m)
+
+def set_preserve_volume(object):
+    for m in object.modifiers:
+        if m.type == 'ARMATURE':
+            m.use_deform_preserve_volume = True
+
 class BindRigifyToArmatureOperator(bpy.types.Operator):
     """Select an armature and a rigify rig. Operator will copy the armature to the rig and binds them"""
     bl_idname = "object.ocr_bind_rigify_to_armature"
@@ -268,10 +263,17 @@ class BindRigifyToArmatureOperator(bpy.types.Operator):
         create_copy_bones(context, rig, mapping)
         fix_twist_bones(context, rig)
 
-        mesh = armature.children[0]
-        mesh.select_set(True)
+        for c in armature.children:
+            c.select_set(True)
+            remove_armature_modifier(c)
+
+        context.view_layer.objects.active = rig
         oops.parent_set(type = 'ARMATURE')
-        mesh.select_set(False)
+        for c in rig.children:
+            c.select_set(False)
+            set_preserve_volume(c)
+
+        aops.ocr_fix_twist_constraints()
         oops.mode_set(mode = 'POSE')
 
 
@@ -327,4 +329,34 @@ class UnfixTwistBonesOperator(bpy.types.Operator):
         unfix_twist_bones(context, context.object, swap_vgroups = True)
         context.object.data.layers[24] = True
         oops.mode_set(mode = 'POSE')
+        return {'FINISHED'}
+
+
+
+class FixTwistConstraintsOperator(bpy.types.Operator):
+    """Fix twist constraints"""
+    bl_idname = "armature.ocr_fix_twist_constraints"
+    bl_label = "Fix twist constraints"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        return (context.space_data.type == 'VIEW_3D'
+            # and len(context.selected_objects) > 0
+            and context.view_layer.objects.active
+            and context.object.type == 'ARMATURE')
+
+    def execute(self, context):
+        oops.mode_set(mode = 'POSE')
+        rig = context.object
+        bones = rig.pose.bones
+        for suffix in ['L', 'R']:
+            n = 'MCH-forearm_tweak.' + suffix + '.001'
+            target = 'hand_tweak.' + suffix
+            bone = bones[n]
+            constr = bone.constraints.new('COPY_ROTATION')
+            constr.target = rig
+            constr.subtarget = target
+            bone.constraints.move(len(bone.constraints) - 1, len(bone.constraints) - 2)
+
         return {'FINISHED'}

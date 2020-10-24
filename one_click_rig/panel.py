@@ -108,6 +108,8 @@ class OCR_PT_OcrPanel(bpy.types.Panel):
         # row = col.row()
         # row.operator("armature.ocr_fix_twist_bones")
         # row.operator("armature.ocr_unfix_twist_bones")
+        # row = col.row()
+        # row.operator("armature.ocr_fix_twist_constraints")
 
 
         col.label(text = "Animation")

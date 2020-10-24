@@ -110,6 +110,7 @@ def set_rigify_types(object):
     for bone_name, rigify_type in saved_rigify_types.items():
         bone = pose_bones[bone_name]
         for key, value in rigify_type.items():
+            bone.rigify_parameters.bbones = 1
             if key == 'rigify_type':
                 bone.rigify_type = value
             # elif key == 'copy_rotaion_axes':
