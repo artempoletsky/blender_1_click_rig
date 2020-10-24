@@ -16,7 +16,7 @@ def merge_vgroups(object, vg_from, vg_to):
     mod.mix_mode = 'ADD'
     mod.mix_set = 'ALL'
 
-    oops.modifier_apply(apply_as = 'DATA', modifier = mod.name)
+    oops.modifier_apply(modifier = mod.name)
 
     vg = object.vertex_groups.get(vg_from)
     object.vertex_groups.remove(vg)
@@ -81,7 +81,7 @@ class MergeBonesOperator(bpy.types.Operator):
         active_bone.select = True
         active_bone.select_head = True
         active_bone.select_tail = True
-        
+
         # self.prefs = preferences.get_prefs()
         oops.mode_set(mode = 'POSE')
 
