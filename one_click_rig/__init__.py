@@ -91,6 +91,7 @@ classes = (
     mapping_editor.AddPrefixOperator,
     mapping_editor.RemovePrefixOperator,
     pose_character.PoseCharacterOperator,
+    pose_character.ApplyPoseOperator,
     pose_character.SavePoseOperator,
 
 )
