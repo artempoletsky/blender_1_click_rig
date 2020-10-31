@@ -135,7 +135,7 @@ class AddUnrealSkeletonOperator(bpy.types.Operator):
         link_parents(rig, context.selected_editable_bones, template['parents'], rig_parents)
 
         bind.create_copy_bones(context, rig, reverse_mapping)
-        bind.fix_twist_bones(context, rig)
+        bind.fix_twist_bones(context, rig, swap_vgroups = True)
 
         oops.mode_set(mode = 'POSE')
         bind.set_ik_follow_bone(context, rig, True)

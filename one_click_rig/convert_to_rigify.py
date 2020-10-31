@@ -48,7 +48,7 @@ class ConvertToRigifyOperator(bpy.types.Operator):
         mapping_reverse.rename_armature(armature_object.data)
         oops.mode_set(mode = 'OBJECT')
         oops.ocr_bind_rigify_to_armature()
-
+        
         objs = bpy.data.objects
 
         objs.remove(armature_object)

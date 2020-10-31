@@ -100,11 +100,19 @@ class OCR_PT_OcrPanel(bpy.types.Panel):
         row = col.row()
         row.operator("pose.ocr_pose_character")
         row = col.row()
+        row.operator("pose.ocr_apply_pose", text = "Apply pose")
+        row = col.row()
         row.operator("object.ocr_add_unreal_skeleton")
         row = col.row()
         row.operator("object.ocr_reset_rigify")
         row = col.row()
         row.operator("object.ocr_apply_scale_rigify")
+        # row = col.row()
+        # row.operator("armature.ocr_fix_twist_bones")
+        # row.operator("armature.ocr_unfix_twist_bones")
+        # row = col.row()
+        # row.operator("armature.ocr_fix_twist_constraints")
+
 
         col.label(text = "Animation")
 

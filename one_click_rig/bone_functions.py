@@ -124,3 +124,24 @@ def prepare_rig(rig):
     rig.show_in_front = True
     set_ik_stretch(rig, 0.0)
     show_layers(rig, True)
+
+
+def swap_vertex_groups_names(object, name1, name2):
+    v_group1 = object.vertex_groups.get(name1)
+    v_group2 = object.vertex_groups.get(name2)
+    if not v_group1 and not v_group2:
+        return
+    if not v_group2:
+        v_group1.name = name2
+        return
+    if not v_group1:
+        v_group2.name = name1
+        return
+
+    v_group1.name = 'temp_renaming_vgroup_name'
+    v_group2.name = name1
+    v_group1.name = name2
+
+def swap_childrens_vgroups_names(armature, name1, name2):
+    for c in armature.children:
+        swap_vertex_groups_names(c, name1, name2)

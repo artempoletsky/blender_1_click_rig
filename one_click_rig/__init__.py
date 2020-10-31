@@ -1,7 +1,7 @@
 bl_info = {
     "name": "1 click rig",
     "author": "Artem Poletsky",
-    "version": (1, 4, 1),
+    "version": (1, 4, 3),
     "blender": (2, 82, 0),
     "location": "",
     "description": "A collection of rig operators",
@@ -64,6 +64,9 @@ classes = (
     swap_bones_weights.SwapBonesWeightsOperator,
     generate_metarig.GenerateMetarigOperator,
     bind_rig_to_armature.BindRigifyToArmatureOperator,
+    bind_rig_to_armature.FixTwistBonesOperator,
+    bind_rig_to_armature.UnfixTwistBonesOperator,
+    bind_rig_to_armature.FixTwistConstraintsOperator,
     convert_to_rigify.ConvertToRigifyOperator,
     convert_to_rigify.ConvertToRigifyByMappingOperator,
     retarget_animation.RetargetAnimationOperator,
@@ -88,6 +91,7 @@ classes = (
     mapping_editor.AddPrefixOperator,
     mapping_editor.RemovePrefixOperator,
     pose_character.PoseCharacterOperator,
+    pose_character.ApplyPoseOperator,
     pose_character.SavePoseOperator,
 
 )

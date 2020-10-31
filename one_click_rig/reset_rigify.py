@@ -1,6 +1,8 @@
 import bpy
 from . import preferences
 from . import bone_functions as b_fun
+from . import bind_rig_to_armature as bind
+import re
 
 oops = bpy.ops.object
 pops = bpy.ops.pose
@@ -32,11 +34,15 @@ class ResetRigifyOperator(bpy.types.Operator):
 
         aops.select_all(action = 'SELECT')
         bones = context.selected_editable_bones
+
+        bind.unfix_twist_bones(context, rig, swap_vgroups = True)
+
         for b in bones:
             if b.name.endswith('.copy'):
                 parent = b.parent
                 parent.use_deform = True
-                name = b.name.rstrip('.copy')
+
+                name = re.sub('.copy$', '', b.name)
                 b_fun.rename_childs_v_group(rig, name, parent.name)
 
             rig.data.edit_bones.remove(b)
@@ -76,5 +82,5 @@ class ApplyScaleRigifyOperator(bpy.types.Operator):
             for c in b.constraints:
                 if c.type == "STRETCH_TO":
                     c.rest_length = 0
-                    
+
         return {'FINISHED'}

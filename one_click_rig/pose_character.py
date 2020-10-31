@@ -101,6 +101,29 @@ class PoseCharacterOperator(bpy.types.Operator):
 
         b_fun.snap_ik_to_fk(rig)
         oops.mode_set(mode = 'OBJECT')
+        
+        return {'FINISHED'}
+
+
+class ApplyPoseOperator(bpy.types.Operator):
+    """Apply pose as rest including meshes"""
+    bl_idname = "pose.ocr_apply_pose"
+    bl_label = "(OCR) Apply pose"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    # example_prop: bpy.props.BoolProperty(name="Example prop", default=False)
+
+    @classmethod
+    def poll(cls, context):
+        return (context.space_data.type == 'VIEW_3D'
+            and context.view_layer.objects.active
+            and context.view_layer.objects.active.type == 'ARMATURE'
+            )
+
+    def execute(self, context):
+        rig = context.view_layer.objects.active
+
+        oops.mode_set(mode = 'OBJECT')
         oops.select_all(action = 'DESELECT')
         for c in rig.children:
             context.view_layer.objects.active = c
