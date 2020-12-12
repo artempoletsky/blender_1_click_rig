@@ -143,6 +143,8 @@ def create_bone_chain(spine_arr, source_armature, object, layer = 0):
     target_bones = target_armature.edit_bones
 
     parent = None
+    if not spine_arr[0] in source_bones:
+        return []
     parent_name = source_bones[spine_arr[0]].parent.name if source_bones[spine_arr[0]].parent else None
     created_bones = []
 
