@@ -40,6 +40,8 @@ class OCR_PT_AnimationPanel(bpy.types.Panel):
         col.operator("anim.ocr_add_keyframe", text = 'Add keyframe')
         col.operator("pose.constraints_clear", text = 'Clear constraints')
         col.operator("nla.bake")
+        col.separator()
+        col.operator("anim.ocr_bake_animation", text = "Bake animation")
         col.operator_context = 'INVOKE_DEFAULT'
 
 

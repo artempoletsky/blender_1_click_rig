@@ -48,6 +48,13 @@ def rename_childs_v_group(rig, name, new_name):
     for c in rig.children:
         rename_v_group(c, name, new_name)
 
+def show_all_layers(rig):
+    layers = rig.data.layers
+    visible_layers = []
+    for i in range(32):
+        visible_layers.append(i)
+    set_array_indices(layers, visible_layers)
+    return
 
 def show_layers(rig, animation_ready):
     layers = rig.data.layers
@@ -96,11 +103,11 @@ def fix_poles(context, rig):
 
 def select_bones(rig, names):
     pops.select_all(action = 'DESELECT')
-    rig.data.bones.active = rig.data.bones[names[0]]
     for n in names:
         rig.data.bones[n].select = True
         rig.data.bones[n].select_head = True
         rig.data.bones[n].select_tail = True
+    rig.data.bones.active = rig.data.bones[names[0]]
 
 def snap_ik_to_fk(rig):
     oops.mode_set(mode = 'POSE')

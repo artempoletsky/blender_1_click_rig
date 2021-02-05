@@ -76,6 +76,7 @@ classes = (
     templates.SaveSkeletonDataOperator,
     templates.RemoveSkeletonDataOperator,
     animation.AddKeyFrameOperator,
+    animation.BakeAnimationOperator,
     panel.OCR_PT_AnimationPanel,
     panel.OCR_PT_OcrPanel,
     panel.SetUESceneSettingsOperator,
