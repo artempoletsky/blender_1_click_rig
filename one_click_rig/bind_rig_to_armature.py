@@ -271,7 +271,7 @@ class BindRigifyToArmatureOperator(bpy.types.Operator):
         oops.parent_set(type = 'ARMATURE')
         for c in rig.children:
             c.select_set(False)
-            set_preserve_volume(c)
+            #set_preserve_volume(c)
 
         aops.ocr_fix_twist_constraints()
         oops.mode_set(mode = 'POSE')
