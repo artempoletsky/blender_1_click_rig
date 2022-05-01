@@ -1,6 +1,5 @@
 import bpy
 from . import preferences
-import chardet
 
 aops = bpy.ops.armature
 oops = bpy.ops.object
